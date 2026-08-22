@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SIGN UP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
+  <style>
+    :root {
+      --bg: #000000;
+      --white: #ffffff;
+      --grey: rgba(255, 255, 255, 0.55);
+      --dim: rgba(255, 255, 255, 0.28);
+      --hairline: rgba(255, 255, 255, 0.18);
+      --font-display: "Anton", sans-serif;
+      --font-body: "Jost", "Helvetica Neue", sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 32px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .panel { width: 100%; max-width: 340px; }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: 52px;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    .field { margin-bottom: 36px; }
+
+    label {
+      display: block;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--grey);
+      margin-bottom: 8px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--hairline);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 300;
+      letter-spacing: 0.04em;
+      padding: 8px 2px 12px;
+      outline: none;
+      transition: border-color 0.25s ease;
+    }
+
+    input::placeholder { color: var(--dim); }
+
+    input:focus { border-bottom-color: var(--white); }
+
+    button {
+      width: 100%;
+      background: var(--white);
+      border: 1px solid var(--white);
+      color: var(--bg);
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.5em;
+      text-indent: 0.5em;
+      text-transform: uppercase;
+      padding: 17px 0;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    button:hover {
+      background: var(--bg);
+      color: var(--white);
+    }
+
+    .response {
+      min-height: 20px;
+      margin-top: 24px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--grey);
+    }
+
+    footer {
+      text-align: center;
+      padding-top: 48px;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
+
+    footer a {
+      color: var(--grey);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    footer a:hover { color: var(--white); }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 42px; }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="panel">
+    <h1>Sign Up</h1>
+
+    <form action="/signup" method="post"
+          hx-post="/signup"
+          hx-target="#response"
+          hx-swap="innerHTML"
+          hx-disabled-elt="find button">
+
+      <div class="field">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" placeholder="name" autocomplete="name" required>
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="email" autocomplete="email" required>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="password" autocomplete="new-password" required minlength="8">
+      </div>
+
+      <div class="field">
+        <label for="confirm">Confirm Password</label>
+        <input type="password" id="confirm" name="confirm_password" placeholder="confirm password" autocomplete="new-password" required minlength="8">
+      </div>
+
+      <button type="submit">Create Account</button>
+
+      <div id="response" class="response" aria-live="polite"></div>
+    </form>
+
+    <footer>
+      <a href="/login.html">Already have an account? Sign in</a>
+    </footer>
+  </main>
+
+</body>
+</html>
