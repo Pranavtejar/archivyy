@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ARCHIVYY</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
+  <style>
+    :root {
+      --bg: #000000;
+      --white: #ffffff;
+      --grey: rgba(255, 255, 255, 0.55);
+      --hairline: rgba(255, 255, 255, 0.18);
+      --font-display: "Anton", sans-serif;
+      --font-body: "Jost", "Helvetica Neue", sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 40px;
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .brand {
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    nav { display: flex; align-items: center; gap: 28px; }
+
+    nav a, nav button {
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--grey);
+      text-decoration: none;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    nav a:hover, nav button:hover { color: var(--white); }
+
+    .empty {
+      padding: 120px 40px;
+      text-align: center;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--grey);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="brand" href="/">Archivyy</a>
+    <nav>
+      {{if .LoggedIn}}
+        <span>{{.Name}}</span>
+        <form method="post" action="/logout" style="display:inline">
+          <button type="submit">Log out</button>
+        </form>
+      {{else}}
+        <a href="/login">Sign in</a>
+        <a href="/signup">Sign up</a>
+      {{end}}
+    </nav>
+  </header>
+
+  <p class="empty">The archive is empty</p>
+
+</body>
+</html>
