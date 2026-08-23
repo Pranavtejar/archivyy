@@ -8,11 +8,16 @@ import (
 	"archivyy/db"
 	"archivyy/handlers"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
+	if err := godotenv.Load(); err != nil && !os.IsNotExist(err) {
+		log.Fatalf("reading .env: %v", err)
+	}
+
 	if os.Getenv("JWT_SECRET") == "" {
 		log.Fatal("JWT_SECRET is not set (see .env.example)")
 	}
