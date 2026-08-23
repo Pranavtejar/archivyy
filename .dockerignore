@@ -1,0 +1,7 @@
+.git
+.env
+*.db
+bin/
+node_modules/
+Makefile
+README.md

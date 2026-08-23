@@ -22,11 +22,11 @@ func main() {
 		log.Fatal("JWT_SECRET is not set (see .env.example)")
 	}
 
-	dbPath := os.Getenv("DB_PATH")
-	if dbPath == "" {
-		dbPath = "./archivyy.db"
+	dsn := os.Getenv("DATABASE_URL")
+	if dsn == "" {
+		log.Fatal("DATABASE_URL is not set (see .env.example)")
 	}
-	db.Init(dbPath)
+	db.Init(dsn)
 	defer db.DB.Close()
 
 	e := echo.New()
