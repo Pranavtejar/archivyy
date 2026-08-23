@@ -1,0 +1,15 @@
+# Environment
+.env
+.env.local
+
+# Binaries
+archivyy
+*.exe
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Go test/coverage output
+*.out
