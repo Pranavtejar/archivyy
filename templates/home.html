@@ -72,6 +72,99 @@
       text-transform: uppercase;
       color: var(--grey);
     }
+
+    .add-bar {
+      margin: 32px auto 0;
+      max-width: 880px;
+      width: calc(100% - 80px);
+      border: 1px solid var(--hairline);
+      background: rgba(255, 255, 255, 0.03);
+      padding: 10px 14px;
+    }
+
+    .add-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .add-bar input[type="text"] {
+      flex: 1;
+      min-width: 160px;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 300;
+      letter-spacing: 0.08em;
+      padding: 6px 2px;
+    }
+
+    .add-bar input[type="text"]::placeholder {
+      color: var(--grey);
+      text-transform: uppercase;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+    }
+
+    .type-chip {
+      font-family: var(--font-body);
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--grey);
+      background: none;
+      border: 1px solid var(--hairline);
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .type-chip:hover { color: var(--white); border-color: rgba(255, 255, 255, 0.45); }
+
+    .type-chip.active {
+      color: #000000;
+      background: var(--white);
+      border-color: var(--white);
+    }
+
+    .file-label {
+      font-family: var(--font-body);
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--grey);
+      border-bottom: 1px dashed var(--hairline);
+      padding: 5px 2px;
+      cursor: pointer;
+      transition: color 0.2s ease;
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .file-label:hover { color: var(--white); }
+
+    .add-submit {
+      font-family: var(--font-display);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--white);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px 4px;
+      transition: opacity 0.2s ease;
+    }
+
+    .add-submit:hover { opacity: 0.6; }
   </style>
 </head>
 <body>
@@ -91,7 +184,24 @@
     </nav>
   </header>
 
+  {{if .LoggedIn}}
+    <section class="add-bar">
+      <form class="add-row" method="post" action="#" enctype="multipart/form-data">
+        <input type="text" name="title" placeholder="Title" autocomplete="off">
+        <button type="button" class="type-chip active" data-type="mp4" data-accept="video/mp4">MP4</button>
+        <button type="button" class="type-chip" data-type="text" data-accept=".txt,.pdf,.doc,.docx">Text</button>
+        <button type="button" class="type-chip" data-type="video" data-accept="video/*">Video</button>
+        <button type="button" class="type-chip" data-type="photo" data-accept="image/*">Photo</button>
+        <input type="hidden" name="data_type" value="mp4">
+        <label class="file-label" id="fileLabel">+ File<input type="file" name="file" hidden></label>
+        <button type="submit" class="add-submit">Add &rarr;</button>
+      </form>
+    </section>
+  {{end}}
+
   <p class="empty">The archive is empty</p>
+
+  <script src="/static/js/home.js" defer></script>
 
 </body>
 </html>
