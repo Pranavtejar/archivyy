@@ -3,25 +3,35 @@ package db
 import (
 	"database/sql"
 	"log"
+	"time"
 
-	_ "modernc.org/sqlite"
+	_ "github.com/lib/pq"
 )
 
 var DB *sql.DB
 
-func Init(path string) {
+func Init(dsn string) {
 	var err error
-	DB, err = sql.Open("sqlite", path)
+	DB, err = sql.Open("postgres", dsn)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err = DB.Ping(); err != nil {
-		log.Fatal(err)
-	}
+	DB.SetMaxOpenConns(25)
+	DB.SetMaxIdleConns(25)
+	DB.SetConnMaxLifetime(5 * time.Minute)
 
-	if _, err = DB.Exec("PRAGMA foreign_keys = ON"); err != nil {
-		log.Fatal(err)
+	// Compose starts the app as soon as Postgres accepts connections, which
+	// is a moment before it is ready to serve. Retry rather than crash.
+	for i := 0; i < 10; i++ {
+		if err = DB.Ping(); err == nil {
+			break
+		}
+		log.Printf("waiting for postgres (%d/10): %v", i+1, err)
+		time.Sleep(2 * time.Second)
+	}
+	if err != nil {
+		log.Fatalf("could not reach postgres: %v", err)
 	}
 
 	createTables()
@@ -30,20 +40,20 @@ func Init(path string) {
 func createTables() {
 	stmts := []string{
 		`CREATE TABLE IF NOT EXISTS users (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			id BIGSERIAL PRIMARY KEY,
 			uuid TEXT NOT NULL UNIQUE,
 			name TEXT NOT NULL,
 			email TEXT NOT NULL UNIQUE,
 			password TEXT NOT NULL,
-			created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+			created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 		)`,
 		`CREATE TABLE IF NOT EXISTS items (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+			id BIGSERIAL PRIMARY KEY,
+			user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 			title TEXT NOT NULL,
 			description TEXT NOT NULL DEFAULT '',
 			kind TEXT NOT NULL,
-			created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+			created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 		)`,
 		`CREATE INDEX IF NOT EXISTS idx_items_created ON items(created_at DESC)`,
 	}
@@ -65,21 +75,21 @@ type User struct {
 
 // CreateUser stores a new user. password must already be hashed.
 func CreateUser(uuid, name, email, password string) (int64, error) {
-	res, err := DB.Exec(
-		`INSERT INTO users (uuid, name, email, password) VALUES (?, ?, ?, ?)`,
+	// Postgres has no LastInsertId; the id comes back from RETURNING.
+	var id int64
+	err := DB.QueryRow(
+		`INSERT INTO users (uuid, name, email, password)
+		 VALUES ($1, $2, $3, $4) RETURNING id`,
 		uuid, name, email, password,
-	)
-	if err != nil {
-		return 0, err
-	}
-	return res.LastInsertId()
+	).Scan(&id)
+	return id, err
 }
 
 // GetUserByEmail returns sql.ErrNoRows if no user matches.
 func GetUserByEmail(email string) (*User, error) {
 	var u User
 	err := DB.QueryRow(
-		`SELECT id, uuid, name, email, password FROM users WHERE email = ?`,
+		`SELECT id, uuid, name, email, password FROM users WHERE email = $1`,
 		email,
 	).Scan(&u.ID, &u.UUID, &u.Name, &u.Email, &u.Password)
 	if err != nil {
@@ -90,6 +100,6 @@ func GetUserByEmail(email string) (*User, error) {
 
 func EmailExists(email string) (bool, error) {
 	var n int
-	err := DB.QueryRow(`SELECT COUNT(1) FROM users WHERE email = ?`, email).Scan(&n)
+	err := DB.QueryRow(`SELECT COUNT(1) FROM users WHERE email = $1`, email).Scan(&n)
 	return n > 0, err
 }

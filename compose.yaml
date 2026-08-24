@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-archivyy}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-archivyy}
+      POSTGRES_DB: ${POSTGRES_DB:-archivyy}
+    ports:
+      # Exposed so you can run the app outside compose, or open a psql client.
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-archivyy} -d ${POSTGRES_DB:-archivyy}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Inside the compose network the database host is the service name.
+      DATABASE_URL: postgres://${POSTGRES_USER:-archivyy}:${POSTGRES_PASSWORD:-archivyy}@db:5432/${POSTGRES_DB:-archivyy}?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in .env}
+      PORT: 8080
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
