@@ -13,3 +13,7 @@ archivyy
 
 # Go test/coverage output
 *.out
+
+#seadweedfs
+seeweed-data/
+seaweedfs.tar.gz
