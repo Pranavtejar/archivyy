@@ -1,5 +1,4 @@
 
-// The archive begins where the forgotten things live.
 package handlers
 
 import (
