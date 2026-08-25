@@ -1,5 +1,4 @@
 
-// No treasure is too obscure.
 (() => {
   const addBar = document.querySelector('.add-bar');
   if (!addBar) return;
