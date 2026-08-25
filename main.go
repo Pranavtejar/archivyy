@@ -27,6 +27,8 @@ func main() {
 	e := echo.New()
 	e.HideBanner = true
 	e.Use(middleware.Logger(), middleware.Recover())
+	handlers.Init()
+
 	e.Renderer = handlers.NewRenderer("templates/*.html")
 	e.Static("/static", "static")
 
@@ -38,6 +40,7 @@ func main() {
 	e.POST("/login", handlers.Login)
 	e.POST("/signup", handlers.Signup)
 	e.POST("/logout", handlers.Logout)
+	e.POST("/upload", handlers.Upload, auth.Middleware)
 
 	port := os.Getenv("PORT")
 	if port == "" {

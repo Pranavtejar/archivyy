@@ -38,7 +38,7 @@ func SignupPage(c echo.Context) error {
 	return c.Render(http.StatusOK, "signup.html", pageData(c))
 }
 
-// Home is public: signed-out visitors can browse the archive.
 func Home(c echo.Context) error {
 	return c.Render(http.StatusOK, "home.html", pageData(c))
 }
+

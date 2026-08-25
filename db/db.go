@@ -37,15 +37,6 @@ func createTables() {
 			password TEXT NOT NULL,
 			created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 		)`,
-		`CREATE TABLE IF NOT EXISTS items (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-			title TEXT NOT NULL,
-			description TEXT NOT NULL DEFAULT '',
-			kind TEXT NOT NULL,
-			created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-		)`,
-		`CREATE INDEX IF NOT EXISTS idx_items_created ON items(created_at DESC)`,
 	}
 
 	for _, s := range stmts {
@@ -93,3 +84,5 @@ func EmailExists(email string) (bool, error) {
 	err := DB.QueryRow(`SELECT COUNT(1) FROM users WHERE email = ?`, email).Scan(&n)
 	return n > 0, err
 }
+
+

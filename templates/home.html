@@ -1,13 +1,16 @@
-<!doctype html>
+
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ARCHIVYY</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+
   <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
+
   <style>
     :root {
       --bg: #000000;
@@ -18,7 +21,11 @@
       --font-body: "Jost", "Helvetica Neue", sans-serif;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     body {
       background: var(--bg);
@@ -38,16 +45,22 @@
 
     .brand {
       font-family: var(--font-display);
-      font-size: 22px;
+      font-size: 24px;
+      font-weight: 700;
       letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--white);
       text-decoration: none;
     }
 
-    nav { display: flex; align-items: center; gap: 28px; }
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
 
-    nav a, nav button {
+    nav a,
+    nav button {
       font-family: var(--font-body);
       font-size: 10px;
       font-weight: 500;
@@ -62,7 +75,10 @@
       transition: color 0.2s ease;
     }
 
-    nav a:hover, nav button:hover { color: var(--white); }
+    nav a:hover,
+    nav button:hover {
+      color: var(--white);
+    }
 
     .empty {
       padding: 120px 40px;
@@ -74,57 +90,62 @@
     }
 
     .add-bar {
-      margin: 32px auto 0;
-      max-width: 880px;
+      margin: 28px auto 0;
+      max-width: 720px;
       width: calc(100% - 80px);
       border: 1px solid var(--hairline);
-      background: rgba(255, 255, 255, 0.03);
-      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 12px 16px;
+      border-radius: 2px;
     }
 
     .add-row {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
     .add-bar input[type="text"] {
       flex: 1;
-      min-width: 160px;
+      min-width: 140px;
       background: transparent;
       border: none;
       outline: none;
       color: var(--white);
       font-family: var(--font-body);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 300;
-      letter-spacing: 0.08em;
-      padding: 6px 2px;
+      letter-spacing: 0.06em;
+      padding: 5px 2px;
     }
 
     .add-bar input[type="text"]::placeholder {
       color: var(--grey);
       text-transform: uppercase;
-      font-size: 10px;
-      letter-spacing: 0.3em;
+      font-size: 9px;
+      letter-spacing: 0.28em;
     }
 
     .type-chip {
       font-family: var(--font-body);
-      font-size: 9px;
+      font-size: 8px;
       font-weight: 500;
       letter-spacing: 0.22em;
       text-transform: uppercase;
       color: var(--grey);
       background: none;
       border: 1px solid var(--hairline);
-      padding: 5px 10px;
+      padding: 4px 8px;
       cursor: pointer;
       transition: all 0.2s ease;
+      border-radius: 1px;
     }
 
-    .type-chip:hover { color: var(--white); border-color: rgba(255, 255, 255, 0.45); }
+    .type-chip:hover {
+      color: var(--white);
+      border-color: rgba(255, 255, 255, 0.45);
+    }
 
     .type-chip.active {
       color: #000000;
@@ -134,46 +155,160 @@
 
     .file-label {
       font-family: var(--font-body);
-      font-size: 9px;
+      font-size: 8px;
       font-weight: 500;
       letter-spacing: 0.22em;
       text-transform: uppercase;
       color: var(--grey);
       border-bottom: 1px dashed var(--hairline);
-      padding: 5px 2px;
+      padding: 4px 2px;
       cursor: pointer;
       transition: color 0.2s ease;
-      max-width: 140px;
+      max-width: 120px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
-    .file-label:hover { color: var(--white); }
+    .file-label:hover {
+      color: var(--white);
+    }
 
     .add-submit {
       font-family: var(--font-display);
-      font-size: 12px;
-      letter-spacing: 0.14em;
+      font-size: 11px;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--white);
       background: none;
       border: none;
       cursor: pointer;
-      padding: 6px 4px;
+      padding: 5px 4px;
       transition: opacity 0.2s ease;
     }
 
-    .add-submit:hover { opacity: 0.6; }
+    .add-submit:hover {
+      opacity: 0.6;
+    }
+
+    .preview-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .preview-thumb {
+      width: 40px;
+      height: 40px;
+      border-radius: 2px;
+      object-fit: cover;
+      border: 1px solid var(--hairline);
+      flex-shrink: 0;
+    }
+
+    .preview-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 2px;
+      border: 1px solid var(--hairline);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--grey);
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .preview-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .preview-name {
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      color: var(--white);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .preview-size {
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      color: var(--grey);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 1px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--white);
+      border-radius: 1px;
+      transition: width 0.15s ease;
+    }
+
+    .preview-clear {
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--grey);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      transition: color 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .preview-clear:hover {
+      color: var(--white);
+    }
+
+    .upload-msg {
+      text-align: center;
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--grey);
+      padding: 8px 0 2px;
+      min-height: 18px;
+    }
+
+    .upload-msg.success {
+      color: #6fcf6f;
+    }
+
+    .upload-msg.error {
+      color: #cf6f6f;
+    }
   </style>
 </head>
-<body>
 
+<body>
   <header>
     <a class="brand" href="/">Archivyy</a>
+
     <nav>
       {{if .LoggedIn}}
         <span>{{.Name}}</span>
+
         <form method="post" action="/logout" style="display:inline">
           <button type="submit">Log out</button>
         </form>
@@ -186,22 +321,133 @@
 
   {{if .LoggedIn}}
     <section class="add-bar">
-      <form class="add-row" method="post" action="#" enctype="multipart/form-data">
-        <input type="text" name="title" placeholder="Title" autocomplete="off">
-        <button type="button" class="type-chip active" data-type="mp4" data-accept="video/mp4">MP4</button>
-        <button type="button" class="type-chip" data-type="text" data-accept=".txt,.pdf,.doc,.docx">Text</button>
-        <button type="button" class="type-chip" data-type="video" data-accept="video/*">Video</button>
-        <button type="button" class="type-chip" data-type="photo" data-accept="image/*">Photo</button>
-        <input type="hidden" name="data_type" value="mp4">
-        <label class="file-label" id="fileLabel">+ File<input type="file" name="file" hidden></label>
-        <button type="submit" class="add-submit">Add &rarr;</button>
+      <form
+        id="uploadForm"
+        class="add-row"
+        method="post"
+        action="/upload"
+        enctype="multipart/form-data"
+      >
+        <input
+          type="text"
+          name="title"
+          placeholder="Title"
+          autocomplete="off"
+        >
+
+        <button
+          type="button"
+          class="type-chip active"
+          data-type="mp4"
+          data-accept="video/mp4"
+        >
+          MP4
+        </button>
+
+        <button
+          type="button"
+          class="type-chip"
+          data-type="text"
+          data-accept=".txt,.pdf,.doc,.docx"
+        >
+          Text
+        </button>
+
+        <button
+          type="button"
+          class="type-chip"
+          data-type="video"
+          data-accept="video/*"
+        >
+          Video
+        </button>
+
+        <button
+          type="button"
+          class="type-chip"
+          data-type="photo"
+          data-accept="image/*"
+        >
+          Photo
+        </button>
+
+        <input
+          type="hidden"
+          name="data_type"
+          value="mp4"
+        >
+
+        <label class="file-label" id="fileLabel">
+          <span id="fileLabelText">+ File</span>
+
+          <input
+            type="file"
+            name="file"
+            id="fileInput"
+            hidden
+          >
+        </label>
+
+        <button
+          type="submit"
+          class="add-submit"
+          id="submitBtn"
+        >
+          Add &rarr;
+        </button>
       </form>
+
+      <div
+        id="previewArea"
+        class="preview-wrap"
+        style="display:none"
+      >
+        <div
+          id="previewThumb"
+          class="preview-thumb"
+        ></div>
+
+        <div class="preview-info">
+          <span
+            class="preview-name"
+            id="previewName"
+          ></span>
+
+          <span
+            class="preview-size"
+            id="previewSize"
+          ></span>
+
+          <div class="progress-track">
+            <div
+              class="progress-fill"
+              id="progressFill"
+            ></div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="preview-clear"
+          id="previewClear"
+        >
+          &times;
+        </button>
+      </div>
+
+      <div
+        id="uploadMsg"
+        class="upload-msg"
+        aria-live="polite"
+      ></div>
     </section>
   {{end}}
 
   <p class="empty">The archive is empty</p>
 
-  <script src="/static/js/home.js" defer></script>
-
+  <script
+    src="/static/js/home.js"
+    defer
+  ></script>
 </body>
 </html>

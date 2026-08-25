@@ -1,0 +1,20 @@
+=============== Aug 25, 2026 (IST) ===============
+21:38:44.688833 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+21:38:44.823933 db@open opening
+21:38:44.824697 version@stat F·[] S·0B[] Sc·[]
+21:38:44.959037 db@janitor F·2 G·0
+21:38:44.959142 db@open done T·135.035486ms
+21:39:29.708744 db@close closing
+21:39:29.708850 db@close done T·101.52µs
+=============== Aug 25, 2026 (IST) ===============
+21:39:51.766703 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+21:39:51.766815 version@stat F·[] S·0B[] Sc·[]
+21:39:51.766843 db@open opening
+21:39:51.766897 journal@recovery F·1
+21:39:51.767385 journal@recovery recovering @1
+21:39:51.771537 memdb@flush created L0@2 N·3 S·333B "^G?..tem,v2":"fil...id,v1"
+21:39:51.781291 version@stat F·[1] S·333B[333B] Sc·[0.25]
+21:39:51.784903 db@janitor F·3 G·0
+21:39:51.784946 db@open done T·18.077896ms
+22:32:11.409431 db@close closing
+22:32:11.409479 db@close done T·47.274µs
