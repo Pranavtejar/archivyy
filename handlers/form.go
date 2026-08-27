@@ -38,7 +38,8 @@ func Init() {
 
 	s3client = s3.NewFromConfig(cfg)
 }
-//remove fmt error handling in the future 
+//remove fmt error handling in the future
+//create new func to retrive all the uploaded data and sort it based of a recomendation algorithm 
 func Upload(c echo.Context) error {
 	form, err := c.MultipartForm()
 	if err != nil {
