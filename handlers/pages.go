@@ -41,4 +41,3 @@ func SignupPage(c echo.Context) error {
 func Home(c echo.Context) error {
 	return c.Render(http.StatusOK, "home.html", pageData(c))
 }
-

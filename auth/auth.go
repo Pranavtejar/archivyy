@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -96,13 +97,29 @@ func ClearCookie() *http.Cookie {
 }
 
 // Middleware requires a valid session, redirecting to /login otherwise.
+// API clients (fetch/XHR) get a JSON 401 instead, so an expired session does
+// not silently turn into a redirected request that reports success.
 func Middleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if !loadUser(c) {
+			if isAPIRequest(c) {
+				return c.JSON(http.StatusUnauthorized, map[string]string{
+					"error": "not authenticated",
+				})
+			}
 			return c.Redirect(http.StatusSeeOther, "/login")
 		}
 		return next(c)
 	}
+}
+
+// isAPIRequest reports whether the client is expecting JSON, not a page
+// redirect. Browsers send Sec-Fetch-Mode on both fetch and XHR calls.
+func isAPIRequest(c echo.Context) bool {
+	r := c.Request()
+	return r.Header.Get("Sec-Fetch-Mode") == "cors" ||
+		r.Header.Get("X-Requested-With") == "XMLHttpRequest" ||
+		strings.HasPrefix(r.Header.Get("Accept"), "application/json")
 }
 
 // Optional populates user context when signed in, but allows anonymous

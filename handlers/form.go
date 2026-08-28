@@ -1,12 +1,16 @@
-
 // The archive begins where the forgotten things live.
 package handlers
 
 import (
-	"context"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"os"
+	"strings"
+
+	"mime/multipart"
+	"net/textproto"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
@@ -74,7 +78,7 @@ func Upload(c echo.Context) error {
 	}
 	defer src.Close()
 
-	_, err = s3client.PutObject(context.Background(), &s3.PutObjectInput{
+	_, err = s3client.PutObject(c.Request().Context(), &s3.PutObjectInput{
 		Bucket:      aws.String("archive"),
 		Key:         aws.String(file.Filename),
 		Body:        src,
@@ -94,3 +98,96 @@ func Upload(c echo.Context) error {
 	})
 }
 
+// Display streams every object in the "archive" bucket back as a
+// multipart/mixed response, one part per object. The part headers carry the
+// stored content type and the object key as the filename so a client can
+// rebuild each file without knowing what is in the archive ahead of time.
+func Display(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	paginator := s3.NewListObjectsV2Paginator(
+		s3client,
+		&s3.ListObjectsV2Input{
+			Bucket:  aws.String("archive"),
+			MaxKeys: aws.Int32(15),
+		},
+	)
+
+	// Gather every key before writing the response head. Listing happens
+	// before anything is flushed, so a failure here can still return a clean
+	// error instead of corrupting an already-started multipart body.
+	var keys []string
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{
+				"error": "failed to list the archive",
+			})
+		}
+		for _, object := range page.Contents {
+			if object.Key != nil && *object.Key != "" {
+				keys = append(keys, *object.Key)
+			}
+		}
+	}
+
+	mw := multipart.NewWriter(c.Response())
+	c.Response().Header().Set(
+		"Content-Type",
+		"multipart/mixed; boundary="+mw.Boundary(),
+	)
+
+	for _, key := range keys {
+		res, err := s3client.GetObject(ctx, &s3.GetObjectInput{
+			Bucket: aws.String("archive"),
+			Key:    aws.String(key),
+		})
+		if err != nil {
+			log.Printf("display: skipping %q: %v", key, err)
+			continue
+		}
+
+		contentType := "application/octet-stream"
+		if res.ContentType != nil && *res.ContentType != "" {
+			contentType = *res.ContentType
+		}
+
+		header := make(textproto.MIMEHeader)
+		header.Set("Content-Type", contentType)
+		header.Set(
+			"Content-Disposition",
+			fmt.Sprintf(`attachment; filename="%s"`, sanitizeFilename(key)),
+		)
+
+		part, err := mw.CreatePart(header)
+		if err != nil {
+			res.Body.Close()
+			log.Printf("display: skipping %q: %v", key, err)
+			continue
+		}
+
+		_, err = io.Copy(part, res.Body)
+		res.Body.Close()
+		if err != nil {
+			log.Printf("display: truncated %q: %v", key, err)
+			continue
+		}
+	}
+
+	return mw.Close()
+}
+
+// sanitizeFilename scrubs characters that would break out of a quoted MIME
+// header (CRLF, quotes and backslashes) in the Content-Disposition filename.
+func sanitizeFilename(key string) string {
+	var b strings.Builder
+	for _, r := range key {
+		switch r {
+		case '\r', '\n', '"', '\\':
+			b.WriteRune('_')
+		default:
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
+}

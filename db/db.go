@@ -84,5 +84,3 @@ func EmailExists(email string) (bool, error) {
 	err := DB.QueryRow(`SELECT COUNT(1) FROM users WHERE email = ?`, email).Scan(&n)
 	return n > 0, err
 }
-
-

@@ -298,6 +298,79 @@
     .upload-msg.error {
       color: #cf6f6f;
     }
+
+    .archive-grid {
+      max-width: 1120px;
+      width: calc(100% - 80px);
+      margin: 40px auto 80px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-decoration: none;
+      border: 1px solid var(--hairline);
+      background: rgba(255, 255, 255, 0.02);
+      padding: 10px;
+      transition: border-color 0.2s ease, opacity 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(255, 255, 255, 0.45);
+      opacity: 0.85;
+    }
+
+    .card-thumb {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      border: 1px solid var(--hairline);
+      background: rgba(255, 255, 255, 0.03);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-thumb img,
+    .card-thumb video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-icon {
+      font-family: var(--font-display);
+      font-size: 15px;
+      letter-spacing: 0.1em;
+      color: var(--grey);
+    }
+
+    .card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .card-name {
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      color: var(--white);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-size {
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      color: var(--grey);
+    }
   </style>
 </head>
 
@@ -443,7 +516,9 @@
     </section>
   {{end}}
 
-  <p class="empty">The archive is empty</p>
+  <p class="empty" id="emptyState">The archive is empty</p>
+
+  <section id="archiveGrid" class="archive-grid" style="display:none"></section>
 
   <script
     src="/static/js/home.js"

@@ -41,6 +41,7 @@ func main() {
 	e.POST("/signup", handlers.Signup)
 	e.POST("/logout", handlers.Logout)
 	e.POST("/upload", handlers.Upload, auth.Middleware)
+	e.GET("/display", handlers.Display)
 
 	port := os.Getenv("PORT")
 	if port == "" {
