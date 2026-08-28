@@ -1,4 +1,3 @@
-// The archive begins where the forgotten things live.
 package handlers
 
 import (
@@ -44,6 +43,8 @@ func Init() {
 	s3client = s3.NewFromConfig(cfg)
 }
 
+// remove fmt error handling in the future
+// create new func to retrive all the uploaded data and sort it based of a recomendation algorithm
 func Upload(c echo.Context) error {
 	form, err := c.MultipartForm()
 	if err != nil {
@@ -54,9 +55,6 @@ func Upload(c echo.Context) error {
 		})
 	}
 
-	fmt.Println("VALUES:", form.Value)
-	fmt.Println("FILES:", form.File)
-
 	files := form.File["file"]
 	if len(files) == 0 {
 		return c.JSON(http.StatusBadRequest, map[string]string{
@@ -65,10 +63,6 @@ func Upload(c echo.Context) error {
 	}
 
 	file := files[0]
-
-	fmt.Println("FIELD: file")
-	fmt.Println("FILENAME:", file.Filename)
-	fmt.Println("TYPE:", file.Header.Get("Content-Type"))
 
 	src, err := file.Open()
 	if err != nil {

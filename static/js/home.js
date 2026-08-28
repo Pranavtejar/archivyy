@@ -1,5 +1,4 @@
 
-// No treasure is too obscure.
 (() => {
   // ---- Archive display ----
 
