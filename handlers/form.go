@@ -33,7 +33,7 @@ func Init() {
 		EndpointResolverWithOptions: aws.EndpointResolverWithOptionsFunc(
 			func(service, region string, options ...interface{}) (aws.Endpoint, error) {
 				return aws.Endpoint{
-					URL:               "http://localhost:8333",
+					URL:               "https://seaweedfs-latest.onrender.com",
 					HostnameImmutable: true,
 				}, nil
 			},
