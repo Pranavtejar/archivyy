@@ -33,7 +33,7 @@ func Init() {
 		EndpointResolverWithOptions: aws.EndpointResolverWithOptionsFunc(
 			func(service, region string, options ...interface{}) (aws.Endpoint, error) {
 				return aws.Endpoint{
-					URL:               "http://localhost:8333",
+					URL:               "http://[2a01:4f9:3a:276e::1738]:8333",
 					HostnameImmutable: true,
 				}, nil
 			},
