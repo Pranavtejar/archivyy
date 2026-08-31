@@ -10,7 +10,7 @@ Archivyy is a self-hosted file archiving and streaming platform built with **Go,
 * Direct file streaming
 * JWT authentication
 * SQLite/PostgreSQL support
-* Lightweight HTMX frontend
+* Lightweight frontend built with **CrossCode**
 
 ### Run locally
 
@@ -37,8 +37,6 @@ Start SeaweedFS, then:
 go run main.go
 ```
 
-Archivyy will be available at `http://localhost:8081`.
-
 ### Architecture
 
 ```text
@@ -47,4 +45,10 @@ Browser → Go/Echo → SeaweedFS/S3
 ```
 
 Files are streamed directly from storage instead of being loaded entirely into memory.
+
+### Credits
+
+Frontend built with **CrossCode**.
+
+Thanks to my friend **Mitul** for helping with the initial SQL authentication implementation.
 
