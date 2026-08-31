@@ -1,2 +1,0 @@
-c6b3fdbc
-{"lastIndex":4,"lastTerm":0,"peers":[{"name":"192.168.1.5:9333.19333","connectionString":"192.168.1.5:19333"}],"state":"eyJtYXhWb2x1bWVJZCI6MCwidG9wb2xvZ3lJZCI6IjkzM2E2MzJjLTg4NzgtNDg2My05NWJiLTBiM2Y1ZGMzNGVjNiJ9","path":"seaweed-data/m9333/snapshot/0_4.ss"}
