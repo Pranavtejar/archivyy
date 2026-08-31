@@ -135,12 +135,13 @@
   function renderFile(file) {
     const card = document.createElement('a');
     card.className = 'card';
-    card.href = URL.createObjectURL(file);
-    card.download = file.name;
-    gridURLs.push(card.href);
+    card.href = '/view/' + encodeURIComponent(file.name);
 
     const thumb = document.createElement('div');
     thumb.className = 'card-thumb';
+
+    const thumbURL = URL.createObjectURL(file);
+    gridURLs.push(thumbURL);
 
     let media = null;
     if (file.type.startsWith('image/')) {
@@ -155,7 +156,7 @@
     }
 
     if (media) {
-      media.src = card.href;
+      media.src = thumbURL;
       thumb.appendChild(media);
     } else {
       const icon = document.createElement('span');

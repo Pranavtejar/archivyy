@@ -1,0 +1,298 @@
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Filename}} &mdash; Archivyy</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #000000;
+      --white: #ffffff;
+      --grey: rgba(255, 255, 255, 0.55);
+      --hairline: rgba(255, 255, 255, 0.18);
+      --font-display: "Anton", sans-serif;
+      --font-body: "Jost", "Helvetica Neue", sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 40px;
+      border-bottom: 1px solid var(--hairline);
+      flex-shrink: 0;
+    }
+
+    .brand {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    nav a,
+    nav button {
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--grey);
+      text-decoration: none;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    nav a:hover,
+    nav button:hover {
+      color: var(--white);
+    }
+
+    .viewer-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 40px;
+      border-bottom: 1px solid var(--hairline);
+      flex-shrink: 0;
+    }
+
+    .back-link {
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--grey);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .back-link:hover {
+      color: var(--white);
+    }
+
+    .viewer-title {
+      font-family: var(--font-display);
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-align: center;
+      flex: 1;
+      padding: 0 20px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .download-link {
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--grey);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .download-link:hover {
+      color: var(--white);
+    }
+
+    .viewer-stage {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+      padding: 24px 40px 40px;
+    }
+
+    .viewer-stage video {
+      max-width: 100%;
+      max-height: calc(100vh - 180px);
+      outline: none;
+    }
+
+    .viewer-stage img {
+      max-width: 100%;
+      max-height: calc(100vh - 180px);
+      object-fit: contain;
+      border: 1px solid var(--hairline);
+    }
+
+    .viewer-stage audio {
+      width: min(480px, 100%);
+      outline: none;
+      filter: invert(1) hue-rotate(180deg);
+    }
+
+    .viewer-fallback {
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .viewer-fallback-ext {
+      font-family: var(--font-display);
+      font-size: 32px;
+      letter-spacing: 0.1em;
+      color: var(--grey);
+      margin-bottom: 16px;
+    }
+
+    .viewer-fallback-text {
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--grey);
+      margin-bottom: 20px;
+    }
+
+    .viewer-fallback .download-link {
+      display: inline-block;
+      font-size: 10px;
+      padding: 8px 20px;
+      border: 1px solid var(--hairline);
+      color: var(--white);
+      transition: all 0.2s ease;
+    }
+
+    .viewer-fallback .download-link:hover {
+      background: var(--white);
+      color: var(--bg);
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding: 20px 20px;
+      }
+
+      .viewer-bar {
+        padding: 12px 20px;
+      }
+
+      .viewer-stage {
+        padding: 16px 20px 32px;
+      }
+
+      .viewer-stage video,
+      .viewer-stage img {
+        max-height: calc(100vh - 160px);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <a class="brand" href="/">Archivyy</a>
+
+    <nav>
+      {{if .LoggedIn}}
+        <span>{{.Name}}</span>
+
+        <form method="post" action="/logout" style="display:inline">
+          <button type="submit">Log out</button>
+        </form>
+      {{else}}
+        <a href="/login">Sign in</a>
+        <a href="/signup">Sign up</a>
+      {{end}}
+    </nav>
+  </header>
+
+  <div class="viewer-bar">
+    <a class="back-link" href="/">&larr; Archive</a>
+    <div class="viewer-title" title="{{.Filename}}">{{.Filename}}</div>
+    <a
+      class="download-link"
+      href="{{.StreamURL}}"
+      download
+    >
+      Download
+    </a>
+  </div>
+
+  <div class="viewer-stage" id="viewerStage"></div>
+
+  <script>
+    (() => {
+      var stage = document.getElementById('viewerStage');
+      if (!stage) return;
+
+      var streamURL = {{.StreamURL}};
+      var filename = {{.Filename}};
+
+      var ext = (filename.split('.').pop() || '').toLowerCase();
+
+      var VIDEO_EXTS = { mp4: 1, webm: 1, mov: 1, ogg: 1, ogv: 1 };
+      var IMAGE_EXTS = { jpg: 1, jpeg: 1, png: 1, gif: 1, webp: 1, svg: 1, bmp: 1, avif: 1 };
+      var AUDIO_EXTS = { mp3: 1, wav: 1, ogg: 1, opus: 1, flac: 1, aac: 1, m4a: 1 };
+
+      if (VIDEO_EXTS[ext]) {
+        var video = document.createElement('video');
+        video.src = streamURL;
+        video.controls = true;
+        video.preload = 'metadata';
+        video.playsInline = true;
+        video.autoplay = true;
+        stage.appendChild(video);
+      } else if (IMAGE_EXTS[ext]) {
+        var img = document.createElement('img');
+        img.src = streamURL;
+        img.alt = filename;
+        stage.appendChild(img);
+      } else if (AUDIO_EXTS[ext]) {
+        var audio = document.createElement('audio');
+        audio.src = streamURL;
+        audio.controls = true;
+        audio.autoplay = true;
+        stage.appendChild(audio);
+      } else {
+        var fallback = document.createElement('div');
+        fallback.className = 'viewer-fallback';
+        fallback.innerHTML =
+          '<div class="viewer-fallback-ext">' + ext.toUpperCase() + '</div>' +
+          '<div class="viewer-fallback-text">Preview not available</div>' +
+          '<a class="download-link" href="' + streamURL + '" download>Download File</a>';
+        stage.appendChild(fallback);
+      }
+    })();
+  </script>
+</body>
+</html>

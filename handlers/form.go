@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	"mime/multipart"
@@ -185,19 +186,56 @@ func sanitizeFilename(key string) string {
 	return b.String()
 }
 
+// Stream serves a single object from the archive bucket.  It supports HTTP
+// Range requests so browsers can seek through video and audio files without
+// downloading the entire asset first.
 func Stream(c echo.Context) error {
-	ctx := c.Request.Context()
-	key := c.Param("objKey")
-	res, err := s3client.GetObject(ctx, &s3.GetObjectInput{
-		Bucket : aws.String("archive"),
-		Key : aws.String(key)
-	})
+	ctx := c.Request().Context()
+	key := c.Param("filename")
+	if key == "" {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	input := &s3.GetObjectInput{
+		Bucket: aws.String("archive"),
+		Key:    aws.String(key),
+	}
+
+	// Forward the client's Range header to S3 for partial-content support.
+	if rh := c.Request().Header.Get("Range"); rh != "" {
+		input.Range = aws.String(rh)
+	}
+
+	res, err := s3client.GetObject(ctx, input)
 	if err != nil {
-		return err
+		return c.NoContent(http.StatusNotFound)
 	}
 	defer res.Body.Close()
 
-	return c.Stream(http.StatusOK, res.ContentType, res.Body)
+	h := c.Response().Header()
+
+	contentType := "application/octet-stream"
+	if res.ContentType != nil && *res.ContentType != "" {
+		contentType = *res.ContentType
+	}
+	h.Set("Content-Type", contentType)
+	h.Set("Accept-Ranges", "bytes")
+	h.Set("Content-Disposition",
+		fmt.Sprintf(`inline; filename="%s"`, sanitizeFilename(key)))
+
+	// S3 returns 206 when a Range request is satisfied.
+	status := http.StatusOK
+	if res.ContentRange != nil && *res.ContentRange != "" {
+		h.Set("Content-Range", *res.ContentRange)
+		status = http.StatusPartialContent
+	}
+
+	if res.ContentLength != nil {
+		c.Response().WriteHeader(status)
+		h.Set("Content-Length", strconv.FormatInt(*res.ContentLength, 10))
+	}
+
+	return c.Stream(status, contentType, res.Body)
 }
 
 

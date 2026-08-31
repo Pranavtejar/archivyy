@@ -38,12 +38,15 @@ func main() {
 	e.GET("/", handlers.Home, auth.Optional)
 	e.GET("/login", handlers.LoginPage, auth.Optional)
 	e.GET("/signup", handlers.SignupPage, auth.Optional)
+	e.GET("/display", handlers.Display)
+	e.GET("/view/:filename", handlers.ViewPage, auth.Optional)
+	e.GET("/stream/:filename", handlers.Stream)
+
 
 	e.POST("/login", handlers.Login)
 	e.POST("/signup", handlers.Signup)
 	e.POST("/logout", handlers.Logout)
 	e.POST("/upload", handlers.Upload, auth.Middleware)
-	e.GET("/display", handlers.Display)
 
 	port := os.Getenv("PORT")
 	if port == "" {

@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"net/url"
 
 	"github.com/labstack/echo/v4"
 )
@@ -40,4 +41,16 @@ func SignupPage(c echo.Context) error {
 
 func Home(c echo.Context) error {
 	return c.Render(http.StatusOK, "home.html", pageData(c))
+}
+
+func ViewPage(c echo.Context) error {
+	filename := c.Param("filename")
+	if filename == "" {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	data := pageData(c)
+	data["Filename"] = filename
+	data["StreamURL"] = "/stream/" + url.PathEscape(filename)
+	return c.Render(http.StatusOK, "view.html", data)
 }
