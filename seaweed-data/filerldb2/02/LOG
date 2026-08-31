@@ -39,3 +39,14 @@
 22:54:36.948828 version@stat F·[2] S·665B[665B] Sc·[0.50]
 22:54:36.955798 db@janitor F·4 G·0
 22:54:36.955847 db@open done T·7.973723ms
+=============== Aug 30, 2026 (IST) ===============
+09:48:55.367408 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+09:48:55.368064 version@stat F·[2] S·665B[665B] Sc·[0.50]
+09:48:55.368083 db@open opening
+09:48:55.368153 journal@recovery F·1
+09:48:55.368238 journal@recovery recovering @8
+09:48:55.368366 version@stat F·[2] S·665B[665B] Sc·[0.50]
+09:48:55.371871 db@janitor F·4 G·0
+09:48:55.371892 db@open done T·3.803574ms
+09:53:03.246413 db@close closing
+09:53:03.246547 db@close done T·129.32µs

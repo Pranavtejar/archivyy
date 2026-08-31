@@ -1,5 +1,22 @@
 [
   {
+    "job_id": "admin_script-scheduled-1788063601758205225-0",
+    "job_type": "admin_script",
+    "request_id": "exec-1788063603760181681-001a9c6214285164",
+    "worker_id": "w-pranav-1640",
+    "dedupe_key": "admin-script:f278f214d147b7b842be6228de3f0e83e1c8867432aa2b2c4856ca768e3b4e3c",
+    "summary": "Run admin script",
+    "state": "job_state_succeeded",
+    "progress": 100,
+    "stage": "completed",
+    "message": "admin script executed (4 command(s))",
+    "attempt": 1,
+    "created_at": "2026-08-30T04:20:01.758221824Z",
+    "updated_at": "2026-08-30T04:20:18.790043928Z",
+    "completed_at": "2026-08-30T04:20:18.790043928Z",
+    "result_summary": "admin script executed (4 command(s))"
+  },
+  {
     "job_id": "admin_script-scheduled-1787676298132873441-0",
     "job_type": "admin_script",
     "request_id": "exec-1787676300134085762-761672f0288be755",

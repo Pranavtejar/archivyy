@@ -39,3 +39,15 @@
 22:54:36.992647 version@stat F·[2] S·1KiB[1KiB] Sc·[0.50]
 22:54:36.996055 db@janitor F·4 G·0
 22:54:36.996087 db@open done T·14.01955ms
+=============== Aug 30, 2026 (IST) ===============
+09:48:55.377538 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+09:48:55.378023 version@stat F·[2] S·1KiB[1KiB] Sc·[0.50]
+09:48:55.378042 db@open opening
+09:48:55.378079 journal@recovery F·1
+09:48:55.378437 journal@recovery recovering @8
+09:48:55.382380 memdb@flush created L0@10 N·27 S·2KiB "\xc5\xf9P..mp4,v34":"\xc5\xf9P..png,v8"
+09:48:55.390215 version@stat F·[3] S·3KiB[3KiB] Sc·[0.75]
+09:48:55.393838 db@janitor F·5 G·0
+09:48:55.393866 db@open done T·15.818053ms
+09:53:03.246830 db@close closing
+09:53:03.246993 db@close done T·157.957µs

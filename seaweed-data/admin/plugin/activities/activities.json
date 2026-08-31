@@ -2166,5 +2166,821 @@
     "message": "scheduled detection started",
     "stage": "detecting",
     "occurred_at": "2026-08-25T17:02:00.138496074Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "admin_script",
+    "source": "admin_scheduler",
+    "message": "scheduled detection started",
+    "stage": "detecting",
+    "occurred_at": "2026-08-30T04:20:01.7509758Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "admin_script",
+    "request_id": "detect-1788063601756147433-5660515afd2f647b",
+    "worker_id": "w-pranav-1640",
+    "source": "detector",
+    "message": "detection requested",
+    "stage": "requested",
+    "details": {
+      "max_results": 1
+    },
+    "occurred_at": "2026-08-30T04:20:01.756827924Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "admin_script",
+    "request_id": "detect-1788063601756147433-5660515afd2f647b",
+    "worker_id": "w-pranav-1640",
+    "source": "detector",
+    "message": "received 1 proposal(s)",
+    "stage": "proposals_batch",
+    "details": {
+      "batch_size": 1,
+      "has_more": false
+    },
+    "occurred_at": "2026-08-30T04:20:01.757463539Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "admin_script",
+    "request_id": "detect-1788063601756147433-5660515afd2f647b",
+    "worker_id": "w-pranav-1640",
+    "source": "detector",
+    "message": "Run admin script",
+    "stage": "proposal",
+    "details": {
+      "dedupe_key": "admin-script:f278f214d147b7b842be6228de3f0e83e1c8867432aa2b2c4856ca768e3b4e3c",
+      "detail": "Admin script with 4 command(s)",
+      "labels": {
+        "script_hash": "f278f214d147b7b842be6228de3f0e83e1c8867432aa2b2c4856ca768e3b4e3c"
+      },
+      "parameters": {
+        "command_count": {
+          "int64_value": "4"
+        },
+        "script": {
+          "string_value": "fs.log.purge -daysAgo=7\nvolume.deleteEmpty -quietFor=24h -apply\nvolume.fix.replication -apply\ns3.clean.uploads -timeAgo=24h"
+        },
+        "script_hash": {
+          "string_value": "f278f214d147b7b842be6228de3f0e83e1c8867432aa2b2c4856ca768e3b4e3c"
+        },
+        "script_name": {
+          "string_value": ""
+        }
+      },
+      "priority": "JOB_PRIORITY_NORMAL",
+      "proposal_id": "admin-script-f278f214-1788063601757080838",
+      "summary": "Run admin script"
+    },
+    "occurred_at": "2026-08-30T04:20:01.757600453Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "admin_script",
+    "request_id": "detect-1788063601756147433-5660515afd2f647b",
+    "worker_id": "w-pranav-1640",
+    "source": "detector",
+    "message": "detection completed",
+    "stage": "completed",
+    "details": {
+      "success": true,
+      "total_proposals": 1
+    },
+    "occurred_at": "2026-08-30T04:20:01.757614551Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "admin_script",
+    "source": "admin_scheduler",
+    "message": "scheduled detection completed: 1 proposal(s)",
+    "stage": "detected",
+    "occurred_at": "2026-08-30T04:20:01.758171899Z"
+  },
+  {
+    "job_id": "admin_script-scheduled-1788063601758205225-0",
+    "job_type": "admin_script",
+    "source": "admin_scheduler",
+    "message": "job queued for execution",
+    "stage": "queued",
+    "occurred_at": "2026-08-30T04:20:01.758221824Z"
+  },
+  {
+    "job_id": "admin_script-scheduled-1788063601758205225-0",
+    "job_type": "admin_script",
+    "request_id": "exec-1788063603760181681-001a9c6214285164",
+    "worker_id": "w-pranav-1640",
+    "source": "admin_dispatch",
+    "message": "job assigned",
+    "stage": "assigned",
+    "occurred_at": "2026-08-30T04:20:03.76035562Z"
+  },
+  {
+    "job_id": "admin_script-scheduled-1788063601758205225-0",
+    "job_type": "admin_script",
+    "request_id": "exec-1788063603760181681-001a9c6214285164",
+    "worker_id": "w-pranav-1640",
+    "source": "activity_source_executor",
+    "message": "admin script job accepted",
+    "stage": "assigned",
+    "occurred_at": "2026-08-30T04:20:03.762649368Z"
+  },
+  {
+    "job_id": "admin_script-scheduled-1788063601758205225-0",
+    "job_type": "admin_script",
+    "request_id": "exec-1788063603760181681-001a9c6214285164",
+    "worker_id": "w-pranav-1640",
+    "source": "worker_progress",
+    "message": "admin script job accepted",
+    "stage": "assigned",
+    "occurred_at": "2026-08-30T04:20:03.763332196Z"
+  },
+  {
+    "job_id": "admin_script-scheduled-1788063601758205225-0",
+    "job_type": "admin_script",
+    "request_id": "exec-1788063603760181681-001a9c6214285164",
+    "worker_id": "w-pranav-1640",
+    "source": "activity_source_executor",
+    "message": "fs.log.purge -daysAgo=7",
+    "stage": "running",
+    "occurred_at": "2026-08-30T04:20:03.764838749Z"
+  },
+  {
+    "job_id": "admin_script-scheduled-1788063601758205225-0",
+    "job_type": "admin_script",
+    "request_id": "exec-1788063603760181681-001a9c6214285164",
+    "worker_id": "w-pranav-1640",
+    "source": "worker_progress",
+    "message": "executed 1/4 command(s)",
+    "stage": "running",
+    "occurred_at": "2026-08-30T04:20:03.765062112Z"
+  },
+  {
+    "job_id": "admin_script-scheduled-1788063601758205225-0",
+    "job_type": "admin_script",
+    "request_id": "exec-1788063603760181681-001a9c6214285164",
+    "worker_id": "w-pranav-1640",
+    "source": "activity_source_executor",
+    "message": "volume.deleteEmpty -quietFor=24h -apply",
+    "stage": "running",
+    "occurred_at": "2026-08-30T04:20:03.783974243Z"
+  },
+  {
+    "job_id": "admin_script-scheduled-1788063601758205225-0",
+    "job_type": "admin_script",
+    "request_id": "exec-1788063603760181681-001a9c6214285164",
+    "worker_id": "w-pranav-1640",
+    "source": "worker_progress",
+    "message": "executed 2/4 command(s)",
+    "stage": "running",
+    "occurred_at": "2026-08-30T04:20:03.784127449Z"
+  },
+  {
+    "job_id": "admin_script-scheduled-1788063601758205225-0",
+    "job_type": "admin_script",
+    "request_id": "exec-1788063603760181681-001a9c6214285164",
+    "worker_id": "w-pranav-1640",
+    "source": "activity_source_executor",
+    "message": "volume.fix.replication -apply",
+    "stage": "running",
+    "occurred_at": "2026-08-30T04:20:18.784771693Z"
+  },
+  {
+    "job_id": "admin_script-scheduled-1788063601758205225-0",
+    "job_type": "admin_script",
+    "request_id": "exec-1788063603760181681-001a9c6214285164",
+    "worker_id": "w-pranav-1640",
+    "source": "worker_progress",
+    "message": "executed 3/4 command(s)",
+    "stage": "running",
+    "occurred_at": "2026-08-30T04:20:18.784906655Z"
+  },
+  {
+    "job_id": "admin_script-scheduled-1788063601758205225-0",
+    "job_type": "admin_script",
+    "request_id": "exec-1788063603760181681-001a9c6214285164",
+    "worker_id": "w-pranav-1640",
+    "source": "activity_source_executor",
+    "message": "s3.clean.uploads -timeAgo=24h",
+    "stage": "running",
+    "occurred_at": "2026-08-30T04:20:18.790019256Z"
+  },
+  {
+    "job_id": "admin_script-scheduled-1788063601758205225-0",
+    "job_type": "admin_script",
+    "request_id": "exec-1788063603760181681-001a9c6214285164",
+    "worker_id": "w-pranav-1640",
+    "source": "worker_progress",
+    "message": "executed 4/4 command(s)",
+    "stage": "running",
+    "occurred_at": "2026-08-30T04:20:18.790510485Z"
+  },
+  {
+    "job_id": "admin_script-scheduled-1788063601758205225-0",
+    "job_type": "admin_script",
+    "request_id": "exec-1788063603760181681-001a9c6214285164",
+    "worker_id": "w-pranav-1640",
+    "source": "worker_completion",
+    "message": "admin script executed (4 command(s))",
+    "stage": "completed",
+    "occurred_at": "2026-08-30T04:20:18.790043928Z"
+  },
+  {
+    "job_id": "admin_script-scheduled-1788063601758205225-0",
+    "job_type": "admin_script",
+    "request_id": "exec-1788063603760181681-001a9c6214285164",
+    "worker_id": "w-pranav-1640",
+    "source": "activity_source_executor",
+    "message": "admin script executed (4 command(s))",
+    "stage": "completed",
+    "occurred_at": "2026-08-30T04:20:18.790043407Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "admin_script",
+    "source": "admin_scheduler",
+    "message": "scheduled execution finished: success=1 error=0 canceled=0",
+    "stage": "executed",
+    "occurred_at": "2026-08-30T04:20:18.793268459Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "ec_balance",
+    "source": "admin_scheduler",
+    "message": "scheduled detection started",
+    "stage": "detecting",
+    "occurred_at": "2026-08-30T04:20:18.793282025Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "ec_balance",
+    "request_id": "detect-1788063620794310813-4bf2028e5e6abc62",
+    "worker_id": "w-pranav-1640",
+    "source": "detector",
+    "message": "detection requested",
+    "stage": "requested",
+    "details": {
+      "max_results": 500
+    },
+    "occurred_at": "2026-08-30T04:20:20.794450229Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "ec_balance",
+    "request_id": "detect-1788063620794310813-4bf2028e5e6abc62",
+    "worker_id": "w-pranav-1640",
+    "source": "activity_source_detector",
+    "message": "EC balance detection: 0 moves proposed (dedup=0, cross_rack=0, within_rack=0, global=0)",
+    "stage": "decision_summary",
+    "details": {
+      "cross_rack_moves": {
+        "int64_value": "0"
+      },
+      "dedup_moves": {
+        "int64_value": "0"
+      },
+      "global_moves": {
+        "int64_value": "0"
+      },
+      "has_more": {
+        "bool_value": false
+      },
+      "imbalance_threshold": {
+        "double_value": 0.2
+      },
+      "min_server_count": {
+        "int64_value": "3"
+      },
+      "total_moves": {
+        "int64_value": "0"
+      },
+      "within_rack_moves": {
+        "int64_value": "0"
+      }
+    },
+    "occurred_at": "2026-08-30T04:20:20.796729649Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "ec_balance",
+    "request_id": "detect-1788063620794310813-4bf2028e5e6abc62",
+    "worker_id": "w-pranav-1640",
+    "source": "worker_detection",
+    "message": "EC balance detection: 0 moves proposed (dedup=0, cross_rack=0, within_rack=0, global=0)",
+    "stage": "decision_summary",
+    "occurred_at": "2026-08-30T04:20:20.796860966Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "ec_balance",
+    "request_id": "detect-1788063620794310813-4bf2028e5e6abc62",
+    "worker_id": "w-pranav-1640",
+    "source": "detector",
+    "message": "received 0 proposal(s)",
+    "stage": "proposals_batch",
+    "details": {
+      "batch_size": 0,
+      "has_more": false
+    },
+    "occurred_at": "2026-08-30T04:20:20.79696939Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "ec_balance",
+    "request_id": "detect-1788063620794310813-4bf2028e5e6abc62",
+    "worker_id": "w-pranav-1640",
+    "source": "detector",
+    "message": "detection completed",
+    "stage": "completed",
+    "details": {
+      "success": true,
+      "total_proposals": 0
+    },
+    "occurred_at": "2026-08-30T04:20:20.796974944Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "ec_balance",
+    "source": "admin_scheduler",
+    "message": "scheduled detection completed: 0 proposal(s)",
+    "stage": "detected",
+    "occurred_at": "2026-08-30T04:20:20.797173148Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "erasure_coding",
+    "source": "admin_scheduler",
+    "message": "scheduled detection started",
+    "stage": "detecting",
+    "occurred_at": "2026-08-30T04:20:20.797181285Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "erasure_coding",
+    "request_id": "detect-1788063622797787434-d7d2cb1ae2a72665",
+    "worker_id": "w-pranav-1640",
+    "source": "detector",
+    "message": "detection requested",
+    "stage": "requested",
+    "details": {
+      "max_results": 500
+    },
+    "occurred_at": "2026-08-30T04:20:22.797897123Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "erasure_coding",
+    "request_id": "detect-1788063622797787434-d7d2cb1ae2a72665",
+    "worker_id": "w-pranav-1640",
+    "source": "activity_source_detector",
+    "message": "EC detection: No tasks created for 2 volumes (skipped: 0 already EC, 2 too small, 0 filtered, 0 not quiet, 0 not full)",
+    "stage": "decision_summary",
+    "details": {
+      "fullness_threshold_percent": {
+        "double_value": 95
+      },
+      "has_more": {
+        "bool_value": false
+      },
+      "max_results": {
+        "int64_value": "500"
+      },
+      "min_size_mb": {
+        "int64_value": "30"
+      },
+      "quiet_for_seconds": {
+        "int64_value": "3600"
+      },
+      "selected_tasks": {
+        "int64_value": "0"
+      },
+      "skipped_already_ec": {
+        "int64_value": "0"
+      },
+      "skipped_filtered": {
+        "int64_value": "0"
+      },
+      "skipped_not_full": {
+        "int64_value": "0"
+      },
+      "skipped_not_quiet": {
+        "int64_value": "0"
+      },
+      "skipped_too_small": {
+        "int64_value": "2"
+      },
+      "total_volumes": {
+        "int64_value": "2"
+      }
+    },
+    "occurred_at": "2026-08-30T04:20:22.801961036Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "erasure_coding",
+    "request_id": "detect-1788063622797787434-d7d2cb1ae2a72665",
+    "worker_id": "w-pranav-1640",
+    "source": "worker_detection",
+    "message": "EC detection: No tasks created for 2 volumes (skipped: 0 already EC, 2 too small, 0 filtered, 0 not quiet, 0 not full)",
+    "stage": "decision_summary",
+    "occurred_at": "2026-08-30T04:20:22.802532175Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "erasure_coding",
+    "request_id": "detect-1788063622797787434-d7d2cb1ae2a72665",
+    "worker_id": "w-pranav-1640",
+    "source": "activity_source_detector",
+    "message": "ERASURE CODING: Volume 2: size=5.9MB (need ≥30MB), age=34h39m0s (need ≥1h0m0s), fullness=1.2% (need ≥95.0%)",
+    "stage": "decision_volume",
+    "details": {
+      "age_seconds": {
+        "int64_value": "124769"
+      },
+      "fullness_percent": {
+        "double_value": 1.155807077884674
+      },
+      "required_fullness_percent": {
+        "double_value": 95
+      },
+      "required_min_size_mb": {
+        "int64_value": "30"
+      },
+      "required_quiet_for_seconds": {
+        "int64_value": "3600"
+      },
+      "size_mb": {
+        "double_value": 5.917732238769531
+      },
+      "volume_id": {
+        "int64_value": "2"
+      }
+    },
+    "occurred_at": "2026-08-30T04:20:22.801995621Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "erasure_coding",
+    "request_id": "detect-1788063622797787434-d7d2cb1ae2a72665",
+    "worker_id": "w-pranav-1640",
+    "source": "worker_detection",
+    "message": "ERASURE CODING: Volume 2: size=5.9MB (need ≥30MB), age=34h39m0s (need ≥1h0m0s), fullness=1.2% (need ≥95.0%)",
+    "stage": "decision_volume",
+    "occurred_at": "2026-08-30T04:20:22.802816875Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "erasure_coding",
+    "request_id": "detect-1788063622797787434-d7d2cb1ae2a72665",
+    "worker_id": "w-pranav-1640",
+    "source": "activity_source_detector",
+    "message": "ERASURE CODING: Volume 1: size=0.0MB (need ≥30MB), age=34h38m0s (need ≥1h0m0s), fullness=0.0% (need ≥95.0%)",
+    "stage": "decision_volume",
+    "details": {
+      "age_seconds": {
+        "int64_value": "124726"
+      },
+      "fullness_percent": {
+        "double_value": 0.004084408283233643
+      },
+      "required_fullness_percent": {
+        "double_value": 95
+      },
+      "required_min_size_mb": {
+        "int64_value": "30"
+      },
+      "required_quiet_for_seconds": {
+        "int64_value": "3600"
+      },
+      "size_mb": {
+        "double_value": 0.02091217041015625
+      },
+      "volume_id": {
+        "int64_value": "1"
+      }
+    },
+    "occurred_at": "2026-08-30T04:20:22.802029771Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "erasure_coding",
+    "request_id": "detect-1788063622797787434-d7d2cb1ae2a72665",
+    "worker_id": "w-pranav-1640",
+    "source": "worker_detection",
+    "message": "ERASURE CODING: Volume 1: size=0.0MB (need ≥30MB), age=34h38m0s (need ≥1h0m0s), fullness=0.0% (need ≥95.0%)",
+    "stage": "decision_volume",
+    "occurred_at": "2026-08-30T04:20:22.802997244Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "erasure_coding",
+    "request_id": "detect-1788063622797787434-d7d2cb1ae2a72665",
+    "worker_id": "w-pranav-1640",
+    "source": "detector",
+    "message": "received 0 proposal(s)",
+    "stage": "proposals_batch",
+    "details": {
+      "batch_size": 0,
+      "has_more": false
+    },
+    "occurred_at": "2026-08-30T04:20:22.803146094Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "erasure_coding",
+    "request_id": "detect-1788063622797787434-d7d2cb1ae2a72665",
+    "worker_id": "w-pranav-1640",
+    "source": "detector",
+    "message": "detection completed",
+    "stage": "completed",
+    "details": {
+      "success": true,
+      "total_proposals": 0
+    },
+    "occurred_at": "2026-08-30T04:20:22.803155796Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "erasure_coding",
+    "source": "admin_scheduler",
+    "message": "scheduled detection completed: 0 proposal(s)",
+    "stage": "detected",
+    "occurred_at": "2026-08-30T04:20:22.803843536Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "vacuum",
+    "source": "admin_scheduler",
+    "message": "scheduled detection started",
+    "stage": "detecting",
+    "occurred_at": "2026-08-30T04:20:22.805013052Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "vacuum",
+    "request_id": "detect-1788063624805332125-1cc7cde8ae9f4820",
+    "worker_id": "w-pranav-1640",
+    "source": "detector",
+    "message": "detection requested",
+    "stage": "requested",
+    "details": {
+      "max_results": 200
+    },
+    "occurred_at": "2026-08-30T04:20:24.805594128Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "vacuum",
+    "request_id": "detect-1788063624805332125-1cc7cde8ae9f4820",
+    "worker_id": "w-pranav-1640",
+    "source": "activity_source_detector",
+    "message": "VACUUM: No tasks created for 2 volumes. Threshold=30.00%. Skipped: 2 (garbage\u003cthreshold)",
+    "stage": "decision_summary",
+    "details": {
+      "garbage_threshold_percent": {
+        "double_value": 30
+      },
+      "selected_tasks": {
+        "int64_value": "0"
+      },
+      "skipped_garbage": {
+        "int64_value": "2"
+      },
+      "total_volumes": {
+        "int64_value": "2"
+      }
+    },
+    "occurred_at": "2026-08-30T04:20:24.808593015Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "vacuum",
+    "request_id": "detect-1788063624805332125-1cc7cde8ae9f4820",
+    "worker_id": "w-pranav-1640",
+    "source": "worker_detection",
+    "message": "VACUUM: No tasks created for 2 volumes. Threshold=30.00%. Skipped: 2 (garbage\u003cthreshold)",
+    "stage": "decision_summary",
+    "occurred_at": "2026-08-30T04:20:24.809074001Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "vacuum",
+    "request_id": "detect-1788063624805332125-1cc7cde8ae9f4820",
+    "worker_id": "w-pranav-1640",
+    "source": "activity_source_detector",
+    "message": "VACUUM: Volume 2: garbage=0.01% (need ≥30.00%)",
+    "stage": "decision_volume",
+    "details": {
+      "garbage_percent": {
+        "double_value": 0.007348684778811034
+      },
+      "required_garbage_percent": {
+        "double_value": 30
+      },
+      "volume_id": {
+        "int64_value": "2"
+      }
+    },
+    "occurred_at": "2026-08-30T04:20:24.808614094Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "vacuum",
+    "request_id": "detect-1788063624805332125-1cc7cde8ae9f4820",
+    "worker_id": "w-pranav-1640",
+    "source": "worker_detection",
+    "message": "VACUUM: Volume 2: garbage=0.01% (need ≥30.00%)",
+    "stage": "decision_volume",
+    "occurred_at": "2026-08-30T04:20:24.809231205Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "vacuum",
+    "request_id": "detect-1788063624805332125-1cc7cde8ae9f4820",
+    "worker_id": "w-pranav-1640",
+    "source": "activity_source_detector",
+    "message": "VACUUM: Volume 1: garbage=0.00% (need ≥30.00%)",
+    "stage": "decision_volume",
+    "details": {
+      "garbage_percent": {
+        "double_value": 0
+      },
+      "required_garbage_percent": {
+        "double_value": 30
+      },
+      "volume_id": {
+        "int64_value": "1"
+      }
+    },
+    "occurred_at": "2026-08-30T04:20:24.808620244Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "vacuum",
+    "request_id": "detect-1788063624805332125-1cc7cde8ae9f4820",
+    "worker_id": "w-pranav-1640",
+    "source": "worker_detection",
+    "message": "VACUUM: Volume 1: garbage=0.00% (need ≥30.00%)",
+    "stage": "decision_volume",
+    "occurred_at": "2026-08-30T04:20:24.809331548Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "vacuum",
+    "request_id": "detect-1788063624805332125-1cc7cde8ae9f4820",
+    "worker_id": "w-pranav-1640",
+    "source": "detector",
+    "message": "received 0 proposal(s)",
+    "stage": "proposals_batch",
+    "details": {
+      "batch_size": 0,
+      "has_more": false
+    },
+    "occurred_at": "2026-08-30T04:20:24.809428312Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "vacuum",
+    "request_id": "detect-1788063624805332125-1cc7cde8ae9f4820",
+    "worker_id": "w-pranav-1640",
+    "source": "detector",
+    "message": "detection completed",
+    "stage": "completed",
+    "details": {
+      "success": true,
+      "total_proposals": 0
+    },
+    "occurred_at": "2026-08-30T04:20:24.809438205Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "vacuum",
+    "source": "admin_scheduler",
+    "message": "scheduled detection completed: 0 proposal(s)",
+    "stage": "detected",
+    "occurred_at": "2026-08-30T04:20:24.809915813Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "volume_balance",
+    "source": "admin_scheduler",
+    "message": "scheduled detection started",
+    "stage": "detecting",
+    "occurred_at": "2026-08-30T04:20:24.809923055Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "volume_balance",
+    "request_id": "detect-1788063626810694643-e84b17bc596fff5f",
+    "worker_id": "w-pranav-1640",
+    "source": "detector",
+    "message": "detection requested",
+    "stage": "requested",
+    "details": {
+      "max_results": 100
+    },
+    "occurred_at": "2026-08-30T04:20:26.810862099Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "volume_balance",
+    "request_id": "detect-1788063626810694643-e84b17bc596fff5f",
+    "worker_id": "w-pranav-1640",
+    "source": "activity_source_detector",
+    "message": "BALANCE: No tasks created for 2 volumes across 1 disk type(s). Threshold=20.0%, MinServers=2",
+    "stage": "decision_summary",
+    "details": {
+      "imbalance_threshold_percent": {
+        "double_value": 20
+      },
+      "min_server_count": {
+        "int64_value": "2"
+      },
+      "selected_tasks": {
+        "int64_value": "0"
+      },
+      "total_volumes": {
+        "int64_value": "2"
+      }
+    },
+    "occurred_at": "2026-08-30T04:20:26.815696844Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "volume_balance",
+    "request_id": "detect-1788063626810694643-e84b17bc596fff5f",
+    "worker_id": "w-pranav-1640",
+    "source": "worker_detection",
+    "message": "BALANCE: No tasks created for 2 volumes across 1 disk type(s). Threshold=20.0%, MinServers=2",
+    "stage": "decision_summary",
+    "occurred_at": "2026-08-30T04:20:26.815916793Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "volume_balance",
+    "request_id": "detect-1788063626810694643-e84b17bc596fff5f",
+    "worker_id": "w-pranav-1640",
+    "source": "activity_source_detector",
+    "message": "BALANCE [unknown]: No tasks created - too few servers (1 servers, need ≥2)",
+    "stage": "decision_disk_type",
+    "details": {
+      "disk_type": {
+        "string_value": "unknown"
+      },
+      "required_min_server_count": {
+        "int64_value": "2"
+      },
+      "server_count": {
+        "int64_value": "1"
+      }
+    },
+    "occurred_at": "2026-08-30T04:20:26.815702226Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "volume_balance",
+    "request_id": "detect-1788063626810694643-e84b17bc596fff5f",
+    "worker_id": "w-pranav-1640",
+    "source": "worker_detection",
+    "message": "BALANCE [unknown]: No tasks created - too few servers (1 servers, need ≥2)",
+    "stage": "decision_disk_type",
+    "occurred_at": "2026-08-30T04:20:26.815974494Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "volume_balance",
+    "request_id": "detect-1788063626810694643-e84b17bc596fff5f",
+    "worker_id": "w-pranav-1640",
+    "source": "detector",
+    "message": "received 0 proposal(s)",
+    "stage": "proposals_batch",
+    "details": {
+      "batch_size": 0,
+      "has_more": false
+    },
+    "occurred_at": "2026-08-30T04:20:26.815993649Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "volume_balance",
+    "request_id": "detect-1788063626810694643-e84b17bc596fff5f",
+    "worker_id": "w-pranav-1640",
+    "source": "detector",
+    "message": "detection completed",
+    "stage": "completed",
+    "details": {
+      "success": true,
+      "total_proposals": 0
+    },
+    "occurred_at": "2026-08-30T04:20:26.815996827Z"
+  },
+  {
+    "job_id": "",
+    "job_type": "volume_balance",
+    "source": "admin_scheduler",
+    "message": "scheduled detection completed: 0 proposal(s)",
+    "stage": "detected",
+    "occurred_at": "2026-08-30T04:20:26.816284285Z"
   }
 ]
