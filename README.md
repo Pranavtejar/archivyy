@@ -7,7 +7,6 @@ Archivyy is a self-hosted file archiving and streaming platform built with **Go,
 ### Features
 
 * File uploads to S3/SeaweedFS
-* Direct file streaming
 * JWT authentication
 * SQLite/PostgreSQL support
 * Lightweight frontend built with **CrossCode**
