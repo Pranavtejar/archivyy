@@ -185,5 +185,45 @@ func sanitizeFilename(key string) string {
 	return b.String()
 }
 
+func Stream(c echo.Context) error {
+	ctx := c.Request.Context()
+	key := c.Param("objKey")
+	res, err := s3client.GetObject(ctx, &s3.GetObjectInput{
+		Bucket : aws.String("archive"),
+		Key : aws.String(key)
+	})
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	return c.Stream(http.StatusOK, res.ContentType, res.Body)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
