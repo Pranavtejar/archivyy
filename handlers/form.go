@@ -1,26 +1,62 @@
+// papa
+
 package handlers
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
-	"log"
+	"mime/multipart"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 
-	"mime/multipart"
-	"net/textproto"
-	
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/labstack/echo/v4"
 )
 
+type Meta struct {
+	data map[string]string
+	order []string
+	sync.RWMutex
+}
+
+func (meta *Meta) write(data map[string]string) {
+	meta.Lock()
+	defer meta.Unlock()
+
+	var all []map[string]string
+
+	f, err := os.ReadFile("meta.json")
+	if err == nil && len(f) > 0 {
+		json.Unmarshal(f, &all)
+	}
+
+	all = append(all, data)
+
+	b, _ := json.MarshalIndent(all, "", " ")
+	os.WriteFile("meta.json", b, 0644)
+
+	if len(meta.order) > 15 {
+		meta.order = meta.order[1:]
+	}
+}
+
 var s3client *s3.Client
+var metaData *Meta
 
 func Init() {
+	metaData = &Meta{
+		data:  make(map[string]string),
+		order: []string{},
+	}
+
 	admin := os.Getenv("S3_ACCESS_KEY")
 	secret := os.Getenv("S3_SECRET_KEY")
 
@@ -65,18 +101,27 @@ func Upload(c echo.Context) error {
 
 	file := files[0]
 
+	title := strings.TrimSpace(c.FormValue("title"))
+
 	src, err := file.Open()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": "failed to open file",
 		})
 	}
-	defer src.Close()
+
+	data, err := io.ReadAll(src)
+	src.Close()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": "failed to read file",
+		})
+	}
 
 	_, err = s3client.PutObject(c.Request().Context(), &s3.PutObjectInput{
 		Bucket:      aws.String("archive"),
 		Key:         aws.String(file.Filename),
-		Body:        src,
+		Body:        bytes.NewReader(data),
 		ContentType: aws.String(file.Header.Get("Content-Type")),
 	})
 	if err != nil {
@@ -87,111 +132,165 @@ func Upload(c echo.Context) error {
 		})
 	}
 
+	thumbName, err := saveThumbnail(form)
+	if err != nil {
+		fmt.Println("THUMBNAIL ERROR:", err)
+	}
+
+	newMeta := map[string]string{
+		"key":         file.Filename,
+		"ContentType": file.Header.Get("Content-Type"),
+	}
+
+	if title != "" {
+		newMeta["title"] = title
+	}
+
+	if thumbName != "" {
+		newMeta["thumb"] = thumbName
+	}
+
+	metaData.write(newMeta)
+
 	return c.JSON(http.StatusOK, map[string]string{
 		"message": "File uploaded",
 		"file":    file.Filename,
 	})
 }
 
-// Display streams every object in the "archive" bucket back as a
-// multipart/mixed response, one part per object. The part headers carry the
-// stored content type and the object key as the filename so a client can
-// rebuild each file without knowing what is in the archive ahead of time.
-func Display(c echo.Context) error {
-	ctx := c.Request().Context()
-
-	paginator := s3.NewListObjectsV2Paginator(
-		s3client,
-		&s3.ListObjectsV2Input{
-			Bucket:  aws.String("archive"),
-			MaxKeys: aws.Int32(15),
-		},
-	)
-
-	// Gather every key before writing the response head. Listing happens
-	// before anything is flushed, so a failure here can still return a clean
-	// error instead of corrupting an already-started multipart body.
-	var keys []string
-	for paginator.HasMorePages() {
-		page, err := paginator.NextPage(ctx)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{
-				"error": "failed to list the archive",
-			})
-		}
-		for _, object := range page.Contents {
-			if object.Key != nil && *object.Key != "" {
-				keys = append(keys, *object.Key)
-			}
-		}
+// saveThumbnail stores an optional user-selected thumbnail from the upload
+// form into static/images. It returns the saved filename (empty if none was
+// provided). Thumbnails are chosen by the user; nothing is generated here.
+func saveThumbnail(form *multipart.Form) (string, error) {
+	thumbs := form.File["thumbnail"]
+	if len(thumbs) == 0 {
+		return "", nil
 	}
 
-	mw := multipart.NewWriter(c.Response())
-	c.Response().Header().Set(
-		"Content-Type",
-		"multipart/mixed; boundary="+mw.Boundary(),
-	)
+	t := thumbs[0]
 
-	for _, key := range keys {
-		res, err := s3client.GetObject(ctx, &s3.GetObjectInput{
-			Bucket: aws.String("archive"),
-			Key:    aws.String(key),
-		})
-		if err != nil {
-			log.Printf("display: skipping %q: %v", key, err)
-			continue
-		}
+	src, err := t.Open()
+	if err != nil {
+		return "", err
+	}
+	defer src.Close()
 
-		contentType := "application/octet-stream"
-		if res.ContentType != nil && *res.ContentType != "" {
-			contentType = *res.ContentType
-		}
-
-		header := make(textproto.MIMEHeader)
-		header.Set("Content-Type", contentType)
-		header.Set(
-			"Content-Disposition",
-			fmt.Sprintf(`attachment; filename="%s"`, sanitizeFilename(key)),
-		)
-
-		part, err := mw.CreatePart(header)
-		if err != nil {
-			res.Body.Close()
-			log.Printf("display: skipping %q: %v", key, err)
-			continue
-		}
-
-		_, err = io.Copy(part, res.Body)
-		res.Body.Close()
-		if err != nil {
-			log.Printf("display: truncated %q: %v", key, err)
-			continue
-		}
+	dir := "static/images"
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return "", err
 	}
 
-	return mw.Close()
+	name := slugifyKey(t.Filename)
+	if name == "" {
+		name = "thumb.jpg"
+	}
+
+	dst, err := os.Create(filepath.Join(dir, name))
+	if err != nil {
+		return "", err
+	}
+	defer dst.Close()
+
+	if _, err := io.Copy(dst, src); err != nil {
+		return "", err
+	}
+
+	return name, nil
 }
+
+// Display returns the metadata for every stored object as JSON. It performs
+// no S3 access or file download; each entry carries a preview URL that points
+// to a lightweight thumbnail under /static/images for the frontend cards.
+func Display(c echo.Context) error {
+	var all []map[string]string
+
+	f, err := os.ReadFile("meta.json")
+	if err == nil && len(f) > 0 {
+		json.Unmarshal(f, &all)
+	}
+
+	type item struct {
+		Key         string `json:"key"`
+		Title       string `json:"title"`
+		ContentType string `json:"ContentType"`
+		Preview     string `json:"preview"`
+	}
+
+	items := make([]item, 0, len(all))
+
+	for _, obj := range all {
+		key := obj["key"]
+
+		contentType := obj["ContentType"]
+		if contentType == "" {
+			contentType = "application/octet-stream"
+		}
+
+		title := obj["title"]
+		if title == "" {
+			title = key
+		}
+
+		preview := ""
+		if thumb := obj["thumb"]; thumb != "" {
+			preview = "/static/images/" + thumb
+		}
+
+		items = append(items, item{
+			Key:         key,
+			Title:       title,
+			ContentType: contentType,
+			Preview:     preview,
+		})
+	}
+
+	return c.JSON(http.StatusOK, items)
+}
+
+// slugifyKey turns a stored name into a URL-safe filename for its thumbnail.
+func slugifyKey(key string) string {
+	var b strings.Builder
+
+	for _, r := range key {
+		switch {
+		case r >= 'a' && r <= 'z',
+			r >= 'A' && r <= 'Z',
+			r >= '0' && r <= '9',
+			r == '.', r == '-', r == '_':
+			b.WriteRune(r)
+
+		default:
+			b.WriteByte('-')
+		}
+	}
+
+	return b.String()
+}
+
 // sanitizeFilename scrubs characters that would break out of a quoted MIME
-// header (CRLF, quotes and backslashes) in the Content-Disposition filename.
+// header.
 func sanitizeFilename(key string) string {
 	var b strings.Builder
+
 	for _, r := range key {
 		switch r {
 		case '\r', '\n', '"', '\\':
 			b.WriteRune('_')
+
 		default:
 			b.WriteRune(r)
 		}
 	}
+
 	return b.String()
 }
 
-// Stream serves a single object from the archive bucket.  It supports HTTP
-// Range requests so browsers can seek through video and audio files without
-// downloading the entire asset first.
+// Stream serves a single object from the archive bucket.
+// It supports HTTP Range requests.
 func Stream(c echo.Context) error {
 	ctx := c.Request().Context()
 	key := c.Param("filename")
+
 	if key == "" {
 		return c.NoContent(http.StatusBadRequest)
 	}
@@ -201,7 +300,6 @@ func Stream(c echo.Context) error {
 		Key:    aws.String(key),
 	}
 
-	// Forward the client's Range header to S3 for partial-content support.
 	if rh := c.Request().Header.Get("Range"); rh != "" {
 		input.Range = aws.String(rh)
 	}
@@ -210,58 +308,44 @@ func Stream(c echo.Context) error {
 	if err != nil {
 		return c.NoContent(http.StatusNotFound)
 	}
+
 	defer res.Body.Close()
 
 	h := c.Response().Header()
 
 	contentType := "application/octet-stream"
+
 	if res.ContentType != nil && *res.ContentType != "" {
 		contentType = *res.ContentType
 	}
+
 	h.Set("Content-Type", contentType)
 	h.Set("Accept-Ranges", "bytes")
-	h.Set("Content-Disposition",
-		fmt.Sprintf(`inline; filename="%s"`, sanitizeFilename(key)))
+	h.Set(
+		"Content-Disposition",
+		fmt.Sprintf(
+			`inline; filename="%s"`,
+			sanitizeFilename(key),
+		),
+	)
 
-	// S3 returns 206 when a Range request is satisfied.
 	status := http.StatusOK
+
 	if res.ContentRange != nil && *res.ContentRange != "" {
 		h.Set("Content-Range", *res.ContentRange)
 		status = http.StatusPartialContent
 	}
 
 	if res.ContentLength != nil {
-		c.Response().WriteHeader(status)
-		h.Set("Content-Length", strconv.FormatInt(*res.ContentLength, 10))
+		h.Set(
+			"Content-Length",
+			strconv.FormatInt(*res.ContentLength, 10),
+		)
 	}
 
-	return c.Stream(status, contentType, res.Body)
+	return c.Stream(
+		status,
+		contentType,
+		res.Body,
+	)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

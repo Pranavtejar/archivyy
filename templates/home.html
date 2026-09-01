@@ -461,6 +461,22 @@
           >
         </label>
 
+        <label
+          class="file-label"
+          id="thumbLabel"
+          style="display:none"
+        >
+          <span id="thumbLabelText">+ Thumbnail</span>
+
+          <input
+            type="file"
+            name="thumbnail"
+            id="thumbInput"
+            accept="image/*"
+            hidden
+          >
+        </label>
+
         <button
           type="submit"
           class="add-submit"
@@ -521,7 +537,7 @@
   <section id="archiveGrid" class="archive-grid" style="display:none"></section>
 
   <script
-    src="/static/js/home.js"
+    src="/static/js/home.js?v=5"
     defer
   ></script>
 </body>

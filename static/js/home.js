@@ -4,182 +4,73 @@
 
   const emptyState = document.getElementById('emptyState');
   const grid = document.getElementById('archiveGrid');
-  let gridURLs = [];
-
-  const EXT_MIME = {
-    '.mp4': 'video/mp4',
-    '.webm': 'video/webm',
-    '.mov': 'video/quicktime',
-    '.avi': 'video/x-msvideo',
-    '.mkv': 'video/x-matroska',
-    '.jpg': 'image/jpeg',
-    '.jpeg': 'image/jpeg',
-    '.png': 'image/png',
-    '.gif': 'image/gif',
-    '.webp': 'image/webp',
-    '.svg': 'image/svg+xml',
-    '.bmp': 'image/bmp',
-    '.txt': 'text/plain',
-    '.md': 'text/markdown',
-    '.pdf': 'application/pdf',
-    '.json': 'application/json',
-    '.html': 'text/html',
-    '.csv': 'text/csv',
-    '.zip': 'application/zip',
-    '.mp3': 'audio/mpeg',
-    '.wav': 'audio/wav',
-    '.ogg': 'audio/ogg',
-  };
-
-  function toBinaryString(bytes) {
-    const chunk = 0x8000;
-    const pieces = new Array(Math.ceil(bytes.length / chunk));
-    for (let i = 0, j = 0; i < bytes.length; i += chunk, j++) {
-      pieces[j] = String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
-    }
-    return pieces.join('');
-  }
-
-  function toBytes(str) {
-    const bytes = new Uint8Array(str.length);
-    for (let i = 0; i < str.length; i++) bytes[i] = str.charCodeAt(i) & 0xff;
-    return bytes;
-  }
-
-  function boundaryFrom(contentType) {
-    const m = /;\s*boundary=(?:"([^"]+)"|([^;]+))/i.exec(contentType);
-    return m ? (m[1] || m[2] || '').trim() : '';
-  }
-
-  function parseHeaders(text) {
-    const headers = {};
-    for (const line of text.split('\r\n')) {
-      const i = line.indexOf(':');
-      if (i !== -1) {
-        headers[line.slice(0, i).trim().toLowerCase()] = line.slice(i + 1).trim();
-      }
-    }
-    return headers;
-  }
-
-  function filenameFromDisposition(disposition) {
-    const star = /filename\*\s*=\s*(?:[^']*''|)([^;]+)/i.exec(disposition);
-    if (star) {
-      try {
-        return decodeURIComponent(star[1].trim());
-      } catch (_) {}
-    }
-    const plain = /filename\s*=\s*(?:"([^"]*)"|([^;]*))/i.exec(disposition);
-    if (plain) return (plain[1] || plain[2] || '').trim();
-    return '';
-  }
-
-  function mimeFor(filename, contentType) {
-    const declared = (contentType || '').split(';')[0].trim().toLowerCase();
-    if (declared && declared !== 'application/octet-stream') return declared;
-    const ext = (filename.split('.').pop() || '').toLowerCase();
-    return (ext && EXT_MIME['.' + ext]) || declared || 'application/octet-stream';
-  }
-
-  function parseMultipart(bytes, boundary) {
-    const text = toBinaryString(bytes);
-    const delimiter = '--' + boundary;
-    const files = [];
-    let pos = 0;
-
-    while (pos < text.length) {
-      const start = text.indexOf(delimiter, pos);
-      if (start === -1) break;
-
-      let p = start + delimiter.length;
-
-      if (text.startsWith('--', p)) break;
-      if (!text.startsWith('\r\n', p)) break;
-      p += 2;
-
-      let headerEnd = text.indexOf('\r\n\r\n', p);
-      let headerStep = 4;
-      if (headerEnd === -1) {
-        headerEnd = text.indexOf('\n\n', p);
-        headerStep = 2;
-      }
-      if (headerEnd === -1) break;
-
-      const headers = parseHeaders(text.slice(p, headerEnd));
-      const bodyStart = headerEnd + headerStep;
-
-      const nextDelim = text.indexOf('\r\n' + delimiter, bodyStart);
-      const bodyEnd = nextDelim === -1 ? text.length : nextDelim;
-
-      const name = filenameFromDisposition(headers['content-disposition']);
-      const type = headers['content-type'];
-      const filename = name || `archive-item-${files.length}`;
-      files.push(new File([toBytes(text.slice(bodyStart, bodyEnd))], filename, {
-        type: mimeFor(filename, type),
-      }));
-
-      if (nextDelim === -1) break;
-      pos = nextDelim;
-    }
-
-    return files;
-  }
 
   function clearGrid() {
-    if (!grid) return;
-    gridURLs.forEach((url) => URL.revokeObjectURL(url));
-    gridURLs = [];
-    grid.innerHTML = '';
+    if (grid) grid.innerHTML = '';
   }
 
-  function renderFile(file) {
+  function showCardIcon(thumb, key) {
+    const icon = document.createElement('span');
+    icon.className = 'card-icon';
+    const ext = (key.split('.').pop() || 'FILE').toUpperCase().slice(0, 5);
+    icon.textContent = ext;
+    thumb.appendChild(icon);
+  }
+
+  const IMAGE_TYPES = { 'image/jpeg': 1, 'image/png': 1, 'image/gif': 1, 'image/webp': 1, 'image/svg+xml': 1, 'image/bmp': 1, 'image/avif': 1 };
+  const IMAGE_EXTS = { jpg: 1, jpeg: 1, png: 1, gif: 1, webp: 1, svg: 1, bmp: 1, avif: 1 };
+
+  function isImage(item) {
+    const ct = (item.ContentType || '').toLowerCase().split(';')[0].trim();
+    if (IMAGE_TYPES[ct]) return true;
+    const ext = (item.key.split('.').pop() || '').toLowerCase();
+    return !!IMAGE_EXTS[ext];
+  }
+
+  function renderItem(item) {
     const card = document.createElement('a');
     card.className = 'card';
-    card.href = '/view/' + encodeURIComponent(file.name);
+    card.href = '/view/' + encodeURIComponent(item.key);
 
     const thumb = document.createElement('div');
     thumb.className = 'card-thumb';
 
-    const thumbURL = URL.createObjectURL(file);
-    gridURLs.push(thumbURL);
+    const addImage = (src, alt) => {
+      const img = document.createElement('img');
+      img.loading = 'lazy';
+      img.alt = alt;
+      img.src = src;
+      img.onerror = () => {
+        img.remove();
+        showCardIcon(thumb, item.key);
+      };
+      thumb.appendChild(img);
+    };
 
-    let media = null;
-    if (file.type.startsWith('image/')) {
-      media = document.createElement('img');
-      media.loading = 'lazy';
-    } else if (file.type.startsWith('video/')) {
-      media = document.createElement('video');
-      media.muted = true;
-      media.playsInline = true;
-      media.preload = 'metadata';
-      media.onloadeddata = () => { media.currentTime = 1; };
-    }
-
-    if (media) {
-      media.src = thumbURL;
-      thumb.appendChild(media);
+    if (item.preview) {
+      addImage(item.preview, item.key);
+    } else if (isImage(item)) {
+      addImage('/stream/' + encodeURIComponent(item.key), item.key);
     } else {
-      const icon = document.createElement('span');
-      icon.className = 'card-icon';
-      const ext = (file.name.split('.').pop() || 'FILE').toUpperCase().slice(0, 5);
-      icon.textContent = ext;
-      thumb.appendChild(icon);
+      showCardIcon(thumb, item.key);
     }
 
     const info = document.createElement('div');
     info.className = 'card-info';
 
+    const title = item.title || item.key;
+
     const name = document.createElement('div');
     name.className = 'card-name';
-    name.title = file.name;
-    name.textContent = file.name;
+    name.title = title;
+    name.textContent = title;
 
-    const size = document.createElement('div');
-    size.className = 'card-size';
-    size.textContent = formatSize(file.size);
+    const meta = document.createElement('div');
+    meta.className = 'card-size';
+    meta.textContent = item.ContentType || 'application/octet-stream';
 
     info.appendChild(name);
-    info.appendChild(size);
+    info.appendChild(meta);
 
     card.appendChild(thumb);
     card.appendChild(info);
@@ -192,16 +83,12 @@
     clearGrid();
     emptyState.textContent = 'The archive is empty';
 
-    let files = [];
+    let items = [];
     try {
-      const res = await fetch('/display');
+      const res = await fetch('/display', { cache: 'no-store' });
       if (!res.ok) throw new Error(`/display responded with ${res.status}`);
-
-      const boundary = boundaryFrom(res.headers.get('Content-Type') || '');
-      if (!boundary) throw new Error('multipart boundary missing');
-
-      const bytes = new Uint8Array(await res.arrayBuffer());
-      files = parseMultipart(bytes, boundary);
+      const data = await res.json();
+      items = Array.isArray(data) ? data : [];
     } catch (err) {
       console.error('Archive load failed:', err);
       emptyState.textContent = 'Could not reach the archive';
@@ -211,8 +98,8 @@
     }
 
     grid.style.display = '';
-    emptyState.style.display = files.length ? 'none' : 'block';
-    files.forEach(renderFile);
+    emptyState.style.display = items.length ? 'none' : 'block';
+    items.forEach(renderItem);
   }
 
   loadArchive();
@@ -234,8 +121,30 @@
   const previewClear = document.getElementById('previewClear');
   const submitBtn = document.getElementById('submitBtn');
   const uploadMsg = document.getElementById('uploadMsg');
+  const thumbLabel = document.getElementById('thumbLabel');
+  const thumbInput = document.getElementById('thumbInput');
+  const thumbLabelText = document.getElementById('thumbLabelText');
 
   let previewURL = null;
+
+  const MEDIA_EXTS = { mp4: 1, webm: 1, mov: 1, m4v: 1, mkv: 1, avi: 1, ogv: 1, mp3: 1, wav: 1, ogg: 1, opus: 1, flac: 1, aac: 1, m4a: 1 };
+
+  function isMediaFile(file) {
+    const t = (file.type || '').toLowerCase();
+    if (t.indexOf('video/') === 0 || t.indexOf('audio/') === 0) return true;
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    return !!MEDIA_EXTS[ext];
+  }
+
+  function updateThumbField(file) {
+    if (file && isMediaFile(file)) {
+      thumbLabel.style.display = '';
+    } else {
+      thumbLabel.style.display = 'none';
+      thumbInput.value = '';
+      thumbLabelText.textContent = '+ Thumbnail';
+    }
+  }
 
   chips.forEach(chip => {
     chip.addEventListener('click', () => {
@@ -326,16 +235,29 @@
     previewArea.style.display = 'none';
     progressFill.style.width = '0%';
 
+    thumbLabel.style.display = 'none';
+    thumbInput.value = '';
+    thumbLabelText.textContent = '+ Thumbnail';
+
     uploadMsg.textContent = '';
     uploadMsg.className = 'upload-msg';
   }
 
   fileInput.addEventListener('change', () => {
-    if (fileInput.files.length) {
-      showPreview(fileInput.files[0]);
+    const f = fileInput.files[0];
+    updateThumbField(f);
+
+    if (f) {
+      showPreview(f);
     } else {
       clearPreview();
     }
+  });
+
+  thumbInput.addEventListener('change', () => {
+    thumbLabelText.textContent = thumbInput.files.length
+      ? thumbInput.files[0].name
+      : '+ Thumbnail';
   });
 
   previewClear.addEventListener('click', clearPreview);
@@ -373,6 +295,11 @@
       file,
       file.name
     );
+
+    const thumbFile = thumbInput.files[0];
+    if (thumbFile) {
+      fd.append('thumbnail', thumbFile, thumbFile.name);
+    }
 
     const xhr = new XMLHttpRequest();
 
