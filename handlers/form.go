@@ -1,5 +1,3 @@
-// papa
-
 package handlers
 
 import (
@@ -22,8 +20,7 @@ import (
 )
 
 type Meta struct {
-	data map[string]string
-	order []string
+	order map[string]int
 	sync.RWMutex
 }
 
@@ -43,9 +40,6 @@ func (meta *Meta) write(data map[string]string) {
 	b, _ := json.MarshalIndent(all, "", " ")
 	os.WriteFile("meta.json", b, 0644)
 
-	if len(meta.order) > 15 {
-		meta.order = meta.order[1:]
-	}
 }
 
 var s3client *s3.Client
@@ -53,8 +47,7 @@ var metaData *Meta
 
 func Init() {
 	metaData = &Meta{
-		data:  make(map[string]string),
-		order: []string{},
+		order: make(map[string]int),
 	}
 
 	admin := os.Getenv("S3_ACCESS_KEY")
@@ -149,7 +142,6 @@ func Upload(c echo.Context) error {
 	if thumbName != "" {
 		newMeta["thumb"] = thumbName
 	}
-
 	metaData.write(newMeta)
 
 	return c.JSON(http.StatusOK, map[string]string{
@@ -308,6 +300,9 @@ func Stream(c echo.Context) error {
 	if err != nil {
 		return c.NoContent(http.StatusNotFound)
 	}
+	metaData.Lock()
+	metaData.order[key]++
+	metaData.Unlock()
 
 	defer res.Body.Close()
 

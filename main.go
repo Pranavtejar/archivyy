@@ -8,8 +8,8 @@ import (
 	"archivyy/db"
 	"archivyy/handlers"
 
-	"github.com/labstack/echo/v4"
 	"github.com/joho/godotenv"
+	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
@@ -41,7 +41,6 @@ func main() {
 	e.GET("/display", handlers.Display)
 	e.GET("/view/:filename", handlers.ViewPage, auth.Optional)
 	e.GET("/stream/:filename", handlers.Stream)
-
 
 	e.POST("/login", handlers.Login)
 	e.POST("/signup", handlers.Signup)
