@@ -21,7 +21,7 @@ func (r *Renderer) Render(w io.Writer, name string, data interface{}, c echo.Con
 	return r.templates.ExecuteTemplate(w, name, data)
 }
 
-// pageData carries the signed-in user (if any) to every template.
+
 func pageData(c echo.Context) map[string]interface{} {
 	name, _ := c.Get("name").(string)
 	return map[string]interface{}{

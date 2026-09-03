@@ -1,3 +1,4 @@
+
 # Archivyy
 
 **Try it out:** https://pranav.hackclub.app
@@ -9,6 +10,11 @@ Archivyy is a self-hosted file archiving and streaming platform built with **Go,
 * File uploads to S3/SeaweedFS
 * JWT authentication
 * SQLite/PostgreSQL support
+* Metadata stored locally in JSON for faster archive loading
+* Custom file titles
+* Custom preview thumbnails for video and audio files
+* Dedicated file streaming through `/stream/:filename`
+* HTTP Range support for media streaming
 * Lightweight frontend built with **CrossCode**
 
 ### Run locally
@@ -39,15 +45,21 @@ go run main.go
 ### Architecture
 
 ```text
-Browser → Go/Echo → SeaweedFS/S3
-                  ↘ Database
+Browser
+   ↓
+Go / Echo
+   ↓
+meta.json → archive metadata & previews
+   ↓
+S3 / SeaweedFS → actual files
+   ↓
+/stream/:filename → file streaming
 ```
 
-Files are streamed directly from storage instead of being loaded entirely into memory.
+Archive metadata is loaded separately from the actual files, so the homepage doesn't need to download every archived object just to display the file cards.
 
 ### Credits
 
 Frontend built with **CrossCode**.
 
 Thanks to my friend **Mitul** for helping with the initial SQL authentication implementation.
-
