@@ -97,6 +97,8 @@
       return;
     }
 
+    items.sort((a, b) => (b.views || 0) - (a.views || 0));
+
     grid.style.display = '';
     emptyState.style.display = items.length ? 'none' : 'block';
     items.forEach(renderItem);

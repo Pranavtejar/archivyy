@@ -1,7 +1,8 @@
+// the pigeons have taken over the server room
+
 package handlers
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -19,27 +21,50 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type FileMeta struct {
+	Key         string `json:"key"`
+	Title       string `json:"title,omitempty"`
+	ContentType string `json:"ContentType"`
+	Thumb       string `json:"thumb,omitempty"`
+	Views       int    `json:"views"`
+}
+
 type Meta struct {
-	order map[string]int
+	files []FileMeta
 	sync.RWMutex
 }
 
-func (meta *Meta) write(data map[string]string) {
+func (meta *Meta) write(data FileMeta) error {
 	meta.Lock()
 	defer meta.Unlock()
 
-	var all []map[string]string
+	meta.files = append(meta.files, data)
 
-	f, err := os.ReadFile("meta.json")
-	if err == nil && len(f) > 0 {
-		json.Unmarshal(f, &all)
+	b, err := json.MarshalIndent(meta.files, "", " ")
+	if err != nil {
+		return err
 	}
 
-	all = append(all, data)
+	return os.WriteFile("meta.json", b, 0644)
+}
 
-	b, _ := json.MarshalIndent(all, "", " ")
-	os.WriteFile("meta.json", b, 0644)
+func (meta *Meta) incrementViews(key string) error {
+	meta.Lock()
+	defer meta.Unlock()
 
+	for i := range meta.files {
+		if meta.files[i].Key == key {
+			meta.files[i].Views++
+			break
+		}
+	}
+
+	b, err := json.MarshalIndent(meta.files, "", " ")
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile("meta.json", b, 0644)
 }
 
 var s3client *s3.Client
@@ -47,7 +72,20 @@ var metaData *Meta
 
 func Init() {
 	metaData = &Meta{
-		order: make(map[string]int),
+		files: make([]FileMeta, 0),
+	}
+
+	f, err := os.ReadFile("meta.json")
+
+	if err != nil && !os.IsNotExist(err) {
+		fmt.Println("META READ ERROR:", err)
+	}
+
+	if len(f) > 0 {
+		if err := json.Unmarshal(f, &metaData.files); err != nil {
+			fmt.Println("META JSON ERROR:", err)
+			metaData.files = make([]FileMeta, 0)
+		}
 	}
 
 	admin := os.Getenv("S3_ACCESS_KEY")
@@ -73,13 +111,9 @@ func Init() {
 	s3client = s3.NewFromConfig(cfg)
 }
 
-// remove fmt error handling in the future
-// create new func to retrive all the uploaded data and sort it based of a recomendation algorithm
 func Upload(c echo.Context) error {
 	form, err := c.MultipartForm()
 	if err != nil {
-		fmt.Println("MULTIPART ERROR:", err)
-
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"error": err.Error(),
 		})
@@ -93,7 +127,6 @@ func Upload(c echo.Context) error {
 	}
 
 	file := files[0]
-
 	title := strings.TrimSpace(c.FormValue("title"))
 
 	src, err := file.Open()
@@ -102,21 +135,15 @@ func Upload(c echo.Context) error {
 			"error": "failed to open file",
 		})
 	}
-
-	data, err := io.ReadAll(src)
-	src.Close()
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": "failed to read file",
-		})
-	}
+	defer src.Close()
 
 	_, err = s3client.PutObject(c.Request().Context(), &s3.PutObjectInput{
 		Bucket:      aws.String("archive"),
 		Key:         aws.String(file.Filename),
-		Body:        bytes.NewReader(data),
+		Body:        src,
 		ContentType: aws.String(file.Header.Get("Content-Type")),
 	})
+
 	if err != nil {
 		fmt.Println("S3 UPLOAD ERROR:", err)
 
@@ -130,19 +157,25 @@ func Upload(c echo.Context) error {
 		fmt.Println("THUMBNAIL ERROR:", err)
 	}
 
-	newMeta := map[string]string{
-		"key":         file.Filename,
-		"ContentType": file.Header.Get("Content-Type"),
+	newMeta := FileMeta{
+		Key:         file.Filename,
+		ContentType: file.Header.Get("Content-Type"),
+		Views:       0,
 	}
 
 	if title != "" {
-		newMeta["title"] = title
+		newMeta.Title = title
 	}
 
 	if thumbName != "" {
-		newMeta["thumb"] = thumbName
+		newMeta.Thumb = thumbName
 	}
-	metaData.write(newMeta)
+
+	if err := metaData.write(newMeta); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": "failed to save metadata",
+		})
+	}
 
 	return c.JSON(http.StatusOK, map[string]string{
 		"message": "File uploaded",
@@ -150,9 +183,6 @@ func Upload(c echo.Context) error {
 	})
 }
 
-// saveThumbnail stores an optional user-selected thumbnail from the upload
-// form into static/images. It returns the saved filename (empty if none was
-// provided). Thumbnails are chosen by the user; nothing is generated here.
 func saveThumbnail(form *multipart.Form) (string, error) {
 	thumbs := form.File["thumbnail"]
 	if len(thumbs) == 0 {
@@ -168,6 +198,7 @@ func saveThumbnail(form *multipart.Form) (string, error) {
 	defer src.Close()
 
 	dir := "static/images"
+
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return "", err
 	}
@@ -190,56 +221,53 @@ func saveThumbnail(form *multipart.Form) (string, error) {
 	return name, nil
 }
 
-// Display returns the metadata for every stored object as JSON. It performs
-// no S3 access or file download; each entry carries a preview URL that points
-// to a lightweight thumbnail under /static/images for the frontend cards.
 func Display(c echo.Context) error {
-	var all []map[string]string
+	metaData.RLock()
 
-	f, err := os.ReadFile("meta.json")
-	if err == nil && len(f) > 0 {
-		json.Unmarshal(f, &all)
-	}
+	items := make([]FileMeta, len(metaData.files))
+	copy(items, metaData.files)
+
+	metaData.RUnlock()
+
+	sort.SliceStable(items, func(i, j int) bool {
+		return items[i].Views > items[j].Views
+	})
 
 	type item struct {
 		Key         string `json:"key"`
 		Title       string `json:"title"`
 		ContentType string `json:"ContentType"`
 		Preview     string `json:"preview"`
+		Views       int    `json:"views"`
 	}
 
-	items := make([]item, 0, len(all))
+	result := make([]item, 0, len(items))
 
-	for _, obj := range all {
-		key := obj["key"]
+	for _, obj := range items {
+		title := obj.Title
 
-		contentType := obj["ContentType"]
-		if contentType == "" {
-			contentType = "application/octet-stream"
-		}
-
-		title := obj["title"]
 		if title == "" {
-			title = key
+			title = obj.Key
 		}
 
 		preview := ""
-		if thumb := obj["thumb"]; thumb != "" {
-			preview = "/static/images/" + thumb
+
+		if obj.Thumb != "" {
+			preview = "/static/images/" + obj.Thumb
 		}
 
-		items = append(items, item{
-			Key:         key,
+		result = append(result, item{
+			Key:         obj.Key,
 			Title:       title,
-			ContentType: contentType,
+			ContentType: obj.ContentType,
 			Preview:     preview,
+			Views:       obj.Views,
 		})
 	}
 
-	return c.JSON(http.StatusOK, items)
+	return c.JSON(http.StatusOK, result)
 }
 
-// slugifyKey turns a stored name into a URL-safe filename for its thumbnail.
 func slugifyKey(key string) string {
 	var b strings.Builder
 
@@ -259,8 +287,6 @@ func slugifyKey(key string) string {
 	return b.String()
 }
 
-// sanitizeFilename scrubs characters that would break out of a quoted MIME
-// header.
 func sanitizeFilename(key string) string {
 	var b strings.Builder
 
@@ -277,8 +303,6 @@ func sanitizeFilename(key string) string {
 	return b.String()
 }
 
-// Stream serves a single object from the archive bucket.
-// It supports HTTP Range requests.
 func Stream(c echo.Context) error {
 	ctx := c.Request().Context()
 	key := c.Param("filename")
@@ -300,9 +324,10 @@ func Stream(c echo.Context) error {
 	if err != nil {
 		return c.NoContent(http.StatusNotFound)
 	}
-	metaData.Lock()
-	metaData.order[key]++
-	metaData.Unlock()
+
+	if err := metaData.incrementViews(key); err != nil {
+		fmt.Println("VIEW COUNT ERROR:", err)
+	}
 
 	defer res.Body.Close()
 
@@ -316,6 +341,7 @@ func Stream(c echo.Context) error {
 
 	h.Set("Content-Type", contentType)
 	h.Set("Accept-Ranges", "bytes")
+
 	h.Set(
 		"Content-Disposition",
 		fmt.Sprintf(
