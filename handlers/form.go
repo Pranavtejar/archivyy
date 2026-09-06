@@ -370,3 +370,5 @@ func Stream(c echo.Context) error {
 		res.Body,
 	)
 }
+
+//add a lfu display system 

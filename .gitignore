@@ -11,7 +11,7 @@ archivyy
 *.sqlite
 *.sqlite3
 
-# Go test/coverage output
+# go test/coverage output
 *.out
 
 #seadweedfs
