@@ -3,9 +3,10 @@
   "key": "1_c4sCepiMIaFLWAVfMNycwQ.jpg",
   "title": "icarus",
   "ContentType": "image/jpeg",
-  "views": 1,
+  "views": 2,
   "viewedBy": [
-   ""
+   "",
+   "kitteny"
   ]
  },
  {
@@ -13,9 +14,10 @@
   "title": "icarus",
   "ContentType": "video/mp4",
   "thumb": "marty-supreme.jpg",
-  "views": 1,
+  "views": 2,
   "viewedBy": [
-   ""
+   "",
+   "kitteny"
   ]
  }
 ]

@@ -119,6 +119,19 @@
       text-overflow: ellipsis;
     }
 
+    .view-count {
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--grey);
+      white-space: nowrap;
+      flex-shrink: 0;
+      padding: 12px 40px;
+      text-align: center;
+    }
+
     .download-link {
       font-family: var(--font-body);
       font-size: 10px;
@@ -160,6 +173,12 @@
       width: min(480px, 100%);
       outline: none;
       filter: invert(1) hue-rotate(180deg);
+    }
+
+    .viewer-fallback-wrap {
+      display: flex;
+      justify-content: center;
+      padding: 0 40px 40px;
     }
 
     .viewer-fallback {
@@ -210,6 +229,10 @@
         padding: 16px 20px 32px;
       }
 
+      .viewer-fallback-wrap {
+        padding: 0 20px 32px;
+      }
+
       .viewer-stage video,
       .viewer-stage img {
         max-height: calc(100vh - 160px);
@@ -249,10 +272,13 @@
   </div>
 
   <div class="viewer-stage" id="viewerStage"></div>
+  <div class="view-count">Views-{{.Views}}</div>
+  <div class="viewer-fallback-wrap" id="viewerFallback"></div>
 
   <script>
     (() => {
       var stage = document.getElementById('viewerStage');
+      var fallbackWrap = document.getElementById('viewerFallback');
       if (!stage) return;
 
       var streamURL = {{.StreamURL}};
@@ -290,7 +316,7 @@
           '<div class="viewer-fallback-ext">' + ext.toUpperCase() + '</div>' +
           '<div class="viewer-fallback-text">Preview not available</div>' +
           '<a class="download-link" href="' + streamURL + '" download>Download File</a>';
-        stage.appendChild(fallback);
+        fallbackWrap.appendChild(fallback);
       }
     })();
   </script>

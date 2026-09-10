@@ -52,6 +52,7 @@ func (meta *Meta) write(data FileMeta) error {
 func (meta *Meta) incrementViews(key, name string) error {
 	meta.Lock()
 	defer meta.Unlock()
+	fmt.Printf("VIEW DEBUG: key=%s name=%q\n", key, name)
 	
 	for i := range meta.files {
 		if meta.files[i].Key != key {

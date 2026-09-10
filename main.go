@@ -40,7 +40,7 @@ func main() {
 	e.GET("/signup", handlers.SignupPage, auth.Optional)
 	e.GET("/display", handlers.Display)
 	e.GET("/view/:filename", handlers.ViewPage, auth.Optional)
-	e.GET("/stream/:filename", handlers.Stream)
+	e.GET("/stream/:filename", handlers.Stream, auth.Optional)
 
 	e.POST("/login", handlers.Login)
 	e.POST("/signup", handlers.Signup)

@@ -43,6 +43,18 @@ func Home(c echo.Context) error {
 	return c.Render(http.StatusOK, "home.html", pageData(c))
 }
 
+func viewsForKey(key string) int {
+	metaData.RLock()
+	defer metaData.RUnlock()
+
+	for _, f := range metaData.files {
+		if f.Key == key {
+			return f.Views
+		}
+	}
+	return 0
+}
+
 func ViewPage(c echo.Context) error {
 	filename := c.Param("filename")
 	if filename == "" {
@@ -52,5 +64,6 @@ func ViewPage(c echo.Context) error {
 	data := pageData(c)
 	data["Filename"] = filename
 	data["StreamURL"] = "/stream/" + url.PathEscape(filename)
+	data["Views"] = viewsForKey(filename)
 	return c.Render(http.StatusOK, "view.html", data)
 }
