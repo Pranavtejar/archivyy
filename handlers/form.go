@@ -27,6 +27,7 @@ type FileMeta struct {
 	ContentType string `json:"ContentType"`
 	Thumb       string `json:"thumb,omitempty"`
 	Views       int    `json:"views"`
+	ViewedBy 	 []string `json:"viewedBy,omitempty"`
 }
 
 type Meta struct {
@@ -48,15 +49,22 @@ func (meta *Meta) write(data FileMeta) error {
 	return os.WriteFile("meta.json", b, 0644)
 }
 
-func (meta *Meta) incrementViews(key string) error {
+func (meta *Meta) incrementViews(key, name string) error {
 	meta.Lock()
 	defer meta.Unlock()
-
+	
 	for i := range meta.files {
-		if meta.files[i].Key == key {
-			meta.files[i].Views++
-			break
+		if meta.files[i].Key != key {
+			continue
 		}
+		for _, viewedBy := range meta.files[i].ViewedBy {
+			if viewedBy == name {
+				return nil // User has already viewed this file, no need to increment views
+			}
+		}
+		meta.files[i].Views++
+		meta.files[i].ViewedBy = append(meta.files[i].ViewedBy, name)
+		break	
 	}
 
 	b, err := json.MarshalIndent(meta.files, "", " ")
@@ -315,7 +323,6 @@ func Stream(c echo.Context) error {
 		Bucket: aws.String("archive"),
 		Key:    aws.String(key),
 	}
-
 	if rh := c.Request().Header.Get("Range"); rh != "" {
 		input.Range = aws.String(rh)
 	}
@@ -324,8 +331,8 @@ func Stream(c echo.Context) error {
 	if err != nil {
 		return c.NoContent(http.StatusNotFound)
 	}
-
-	if err := metaData.incrementViews(key); err != nil {
+	name, _ := c.Get("name").(string)
+	if err := metaData.incrementViews(key, name); err != nil {
 		fmt.Println("VIEW COUNT ERROR:", err)
 	}
 
@@ -371,4 +378,4 @@ func Stream(c echo.Context) error {
 	)
 }
 
-//add a lfu display system 
+

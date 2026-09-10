@@ -3,13 +3,19 @@
   "key": "1_c4sCepiMIaFLWAVfMNycwQ.jpg",
   "title": "icarus",
   "ContentType": "image/jpeg",
-  "views": 9
+  "views": 1,
+  "viewedBy": [
+   ""
+  ]
  },
  {
   "key": "2026-08-31 14-37-49.mp4",
   "title": "icarus",
   "ContentType": "video/mp4",
   "thumb": "marty-supreme.jpg",
-  "views": 8
+  "views": 1,
+  "viewedBy": [
+   ""
+  ]
  }
 ]
