@@ -357,5 +357,31 @@
     xhr.open('POST', '/upload');
     xhr.send(fd);
   });
+  const search = document.querySelector("#search");
+  search.addEventListener("input", () => {
+    const query = search.value.toLowerCase();
+    console.log("Search query:", query);
+    fetch("/search?q="+ encodeURIComponent(query))
+    .then((res) => res.json())
+    .then((results) => {
+      console.log("Search results:", results);
+      grid.innerHTML = "";
+      if (results.length === 0) {
+        emptyState.textContent = "No results found";
+        emptyState.style.display = "block";
+        grid.style.display = "none";
+      } else {
+        emptyState.style.display = "none";
+        grid.style.display = "";
+        results.forEach(renderItem);
+      }
+    })
+    .catch((err) => {
+      console.error("Search failed:", err);
+      emptyState.textContent = "Search failed";
+      emptyState.style.display = "block";
+      grid.style.display = "none";
+    });
+  }
 })();
 

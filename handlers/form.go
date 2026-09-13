@@ -28,6 +28,7 @@ type FileMeta struct {
 	Thumb       string `json:"thumb,omitempty"`
 	Views       int    `json:"views"`
 	ViewedBy 	 []string `json:"viewedBy,omitempty"`
+	Tags 			[]string `json:"tags,omitempty"`
 }
 
 type Meta struct {
