@@ -13,7 +13,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// formError replies with an error. htmx swaps the fragment into #response;
+// formError replies with an error. htmx swaps the fragment into #response
 // a plain browser POST falls back to a redirect carrying the message.
 func formError(c echo.Context, path, msg string) error {
 	if c.Request().Header.Get("HX-Request") == "true" {
