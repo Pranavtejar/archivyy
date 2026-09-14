@@ -380,4 +380,20 @@ func Stream(c echo.Context) error {
 	)
 }
 
+func Search(c echo.Context) error {
+	query := strings.ToLower(c.QueryParam("q"))
 
+	metaData.RLock()
+	defer metaData.RUnlock()
+
+	var results []FileMeta
+
+	for _, file := range metaData.files {
+		if strings.Contains(strings.ToLower(file.Key), query) ||
+			strings.Contains(strings.ToLower(file.Title), query) {
+			results = append(results, file)
+		}
+	}
+
+	return c.JSON(http.StatusOK, results)
+}
