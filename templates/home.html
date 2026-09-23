@@ -127,6 +127,79 @@
       letter-spacing: 0.28em;
     }
 
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      max-width: 1120px;
+      width: calc(100% - 80px);
+      margin: 24px auto 0;
+      padding: 10px 14px;
+      border: 1px solid var(--hairline);
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 2px;
+      transition: border-color 0.2s ease;
+    }
+
+    .search-bar:focus-within {
+      border-color: rgba(255, 255, 255, 0.45);
+    }
+
+    .search-bar-label {
+      font-family: var(--font-display);
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--grey);
+      flex-shrink: 0;
+    }
+
+    .search-bar input[type="text"] {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: 0.06em;
+      padding: 4px 2px;
+    }
+
+    .search-bar input[type="text"]::placeholder {
+      color: var(--grey);
+      text-transform: uppercase;
+      font-size: 9px;
+      letter-spacing: 0.28em;
+    }
+
+    .search-count {
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      color: var(--grey);
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .search-clear {
+      font-size: 13px;
+      line-height: 1;
+      color: var(--grey);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      transition: color 0.2s ease;
+      flex-shrink: 0;
+      display: none;
+    }
+
+    .search-clear:hover {
+      color: var(--white);
+    }
+
     .type-chip {
       font-family: var(--font-body);
       font-size: 8px;
@@ -532,12 +605,32 @@
     </section>
   {{end}}
 
+  <section class="search-bar" id="searchBar" aria-label="Search archive">
+    <span class="search-bar-label">Search</span>
+    <input
+      type="text"
+      id="search"
+      placeholder="Title or filename..."
+      autocomplete="off"
+      spellcheck="false"
+    >
+    <span class="search-count" id="searchCount"></span>
+    <button
+      type="button"
+      class="search-clear"
+      id="searchClear"
+      aria-label="Clear search"
+    >
+      &times;
+    </button>
+  </section>
+
   <p class="empty" id="emptyState">The archive is empty</p>
 
   <section id="archiveGrid" class="archive-grid" style="display:none"></section>
 
   <script
-    src="/static/js/home.js?v=6"
+    src="/static/js/home.js?v=8"
     defer
   ></script>
 </body>

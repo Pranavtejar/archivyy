@@ -31,6 +31,15 @@ type FileMeta struct {
 	Tags 			[]string `json:"tags,omitempty"`
 }
 
+type item struct {
+	Key         string `json:"key"`
+	Title       string `json:"title"`
+	ContentType string `json:"ContentType"`
+	Preview     string `json:"preview"`
+	Views       int    `json:"views"`
+}
+
+
 type Meta struct {
 	files []FileMeta
 	sync.RWMutex
@@ -231,25 +240,19 @@ func saveThumbnail(form *multipart.Form) (string, error) {
 	return name, nil
 }
 
-func Display(c echo.Context) error {
-	metaData.RLock()
+func dispItems(items []FileMeta) []item {
+	if items == nil {
+		metaData.RLock()
 
-	items := make([]FileMeta, len(metaData.files))
-	copy(items, metaData.files)
+		items = make([]FileMeta, len(metaData.files))
+		copy(items, metaData.files)
 
-	metaData.RUnlock()
-
+		metaData.RUnlock()
+	}
 	sort.SliceStable(items, func(i, j int) bool {
 		return items[i].Views > items[j].Views
 	})
 
-	type item struct {
-		Key         string `json:"key"`
-		Title       string `json:"title"`
-		ContentType string `json:"ContentType"`
-		Preview     string `json:"preview"`
-		Views       int    `json:"views"`
-	}
 
 	result := make([]item, 0, len(items))
 
@@ -274,7 +277,11 @@ func Display(c echo.Context) error {
 			Views:       obj.Views,
 		})
 	}
+	return result
+}
 
+func Display(c echo.Context) error {
+	result := dispItems(nil)
 	return c.JSON(http.StatusOK, result)
 }
 
@@ -394,6 +401,6 @@ func Search(c echo.Context) error {
 			results = append(results, file)
 		}
 	}
-
-	return c.JSON(http.StatusOK, results)
+	out := dispItems(results)
+	return c.JSON(http.StatusOK, out)
 }

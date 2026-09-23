@@ -4,6 +4,13 @@
 
   const emptyState = document.getElementById('emptyState');
   const grid = document.getElementById('archiveGrid');
+  const search = document.getElementById('search');
+  const searchBar = document.getElementById('searchBar');
+  const searchCount = document.getElementById('searchCount');
+  const searchClear = document.getElementById('searchClear');
+
+  let allItems = [];
+  let searchRequest = 0;
 
   function clearGrid() {
     if (grid) grid.innerHTML = '';
@@ -80,9 +87,6 @@
   async function loadArchive() {
     if (!grid || !emptyState) return;
 
-    clearGrid();
-    emptyState.textContent = 'The archive is empty';
-
     let items = [];
     try {
       const res = await fetch('/display', { cache: 'no-store' });
@@ -94,14 +98,109 @@
       emptyState.textContent = 'Could not reach the archive';
       emptyState.style.display = 'block';
       grid.style.display = 'none';
+      if (searchBar) searchBar.style.display = 'none';
       return;
     }
 
     items.sort((a, b) => (b.views || 0) - (a.views || 0));
+    allItems = items;
+    renderAll();
+  }
 
+  function renderAll() {
+    clearGrid();
+
+    if (searchBar) {
+      searchBar.style.display = allItems.length ? '' : 'none';
+    }
+
+    if (searchCount) {
+      searchCount.textContent = String(allItems.length);
+    }
+
+    if (searchClear) {
+      searchClear.style.display = 'none';
+    }
+
+    if (!allItems.length) {
+      emptyState.textContent = 'The archive is empty';
+      emptyState.style.display = 'block';
+      grid.style.display = 'none';
+      return;
+    }
+
+    emptyState.style.display = 'none';
     grid.style.display = '';
-    emptyState.style.display = items.length ? 'none' : 'block';
-    items.forEach(renderItem);
+    allItems.forEach(renderItem);
+  }
+
+  function renderSearchResults(results) {
+    clearGrid();
+
+    if (searchCount) {
+      searchCount.textContent = `${results.length} / ${allItems.length}`;
+    }
+
+    if (searchClear) {
+      searchClear.style.display = 'block';
+    }
+
+    if (!results.length) {
+      emptyState.textContent = 'No results found';
+      emptyState.style.display = 'block';
+      grid.style.display = 'none';
+      return;
+    }
+
+    emptyState.style.display = 'none';
+    grid.style.display = '';
+    results.forEach(renderItem);
+  }
+
+  async function runSearch(query) {
+    const request = ++searchRequest;
+
+    clearGrid();
+    emptyState.textContent = 'Searching...';
+    emptyState.style.display = 'block';
+    grid.style.display = 'none';
+
+    try {
+      const res = await fetch('/search?q=' + encodeURIComponent(query), { cache: 'no-store' });
+      if (!res.ok) throw new Error(`/search responded with ${res.status}`);
+      const data = await res.json();
+      if (request !== searchRequest) return;
+
+      const results = Array.isArray(data) ? data : [];
+
+      renderSearchResults(results);
+    } catch (err) {
+      if (request !== searchRequest) return;
+      console.error('Search failed:', err);
+      emptyState.textContent = 'Search failed';
+      emptyState.style.display = 'block';
+      grid.style.display = 'none';
+      if (searchCount) searchCount.textContent = '';
+    }
+  }
+
+  if (search) {
+    search.addEventListener('input', () => {
+      const query = search.value.trim().toLowerCase();
+      if (query) {
+        runSearch(query);
+      } else {
+        renderAll();
+      }
+    });
+
+    if (searchClear) {
+      searchClear.addEventListener('click', () => {
+        search.value = '';
+        renderAll();
+        search.focus();
+      });
+    }
   }
 
   loadArchive();
@@ -357,31 +456,5 @@
     xhr.open('POST', '/upload');
     xhr.send(fd);
   });
-  const search = document.querySelector("#search");
-  search.addEventListener("input", () => {
-    const query = search.value.toLowerCase();
-    console.log("Search query:", query);
-    fetch("/search?q="+ encodeURIComponent(query))
-    .then((res) => res.json())
-    .then((results) => {
-      console.log("Search results:", results);
-      grid.innerHTML = "";
-      if (results.length === 0) {
-        emptyState.textContent = "No results found";
-        emptyState.style.display = "block";
-        grid.style.display = "none";
-      } else {
-        emptyState.style.display = "none";
-        grid.style.display = "";
-        results.forEach(renderItem);
-      }
-    })
-    .catch((err) => {
-      console.error("Search failed:", err);
-      emptyState.textContent = "Search failed";
-      emptyState.style.display = "block";
-      grid.style.display = "none";
-    });
-  }
 })();
 
