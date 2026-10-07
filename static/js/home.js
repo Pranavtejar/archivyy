@@ -11,6 +11,17 @@
 
   let allItems = [];
   let searchRequest = 0;
+  let searchTimer = null;
+  let searchAbort = null;
+
+  function cancelSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = null;
+    if (searchAbort) {
+      searchAbort.abort();
+      searchAbort = null;
+    }
+  }
 
   function clearGrid() {
     if (grid) grid.innerHTML = '';
@@ -104,7 +115,13 @@
 
     items.sort((a, b) => (b.views || 0) - (a.views || 0));
     allItems = items;
-    renderAll();
+
+    const activeQuery = search ? search.value.trim().toLowerCase() : '';
+    if (activeQuery) {
+      runSearch(activeQuery);
+    } else {
+      renderAll();
+    }
   }
 
   function renderAll() {
@@ -160,13 +177,21 @@
   async function runSearch(query) {
     const request = ++searchRequest;
 
-    clearGrid();
-    emptyState.textContent = 'Searching...';
-    emptyState.style.display = 'block';
-    grid.style.display = 'none';
+    if (searchAbort) searchAbort.abort();
+    const controller = new AbortController();
+    searchAbort = controller;
+
+    if (!grid.childElementCount) {
+      emptyState.textContent = 'Searching...';
+      emptyState.style.display = 'block';
+      grid.style.display = 'none';
+    }
 
     try {
-      const res = await fetch('/search?q=' + encodeURIComponent(query), { cache: 'no-store' });
+      const res = await fetch('/search?q=' + encodeURIComponent(query), {
+        cache: 'no-store',
+        signal: controller.signal,
+      });
       if (!res.ok) throw new Error(`/search responded with ${res.status}`);
       const data = await res.json();
       if (request !== searchRequest) return;
@@ -175,27 +200,32 @@
 
       renderSearchResults(results);
     } catch (err) {
-      if (request !== searchRequest) return;
+      if (err.name === 'AbortError' || request !== searchRequest) return;
       console.error('Search failed:', err);
       emptyState.textContent = 'Search failed';
       emptyState.style.display = 'block';
       grid.style.display = 'none';
       if (searchCount) searchCount.textContent = '';
+    } finally {
+      if (searchAbort === controller) searchAbort = null;
     }
   }
 
   if (search) {
     search.addEventListener('input', () => {
+      clearTimeout(searchTimer);
       const query = search.value.trim().toLowerCase();
       if (query) {
-        runSearch(query);
+        searchTimer = setTimeout(() => runSearch(query), 250);
       } else {
+        cancelSearch();
         renderAll();
       }
     });
 
     if (searchClear) {
       searchClear.addEventListener('click', () => {
+        cancelSearch();
         search.value = '';
         renderAll();
         search.focus();

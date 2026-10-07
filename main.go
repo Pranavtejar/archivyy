@@ -42,7 +42,6 @@ func main() {
 	e.GET("/search", handlers.Search)
 	e.GET("/view/:filename", handlers.ViewPage, auth.Optional)
 	e.GET("/stream/:filename", handlers.Stream, auth.Optional)
-	e.GET("/search", handlers.Search, auth.Optional)
 
 
 	e.POST("/login", handlers.Login)
