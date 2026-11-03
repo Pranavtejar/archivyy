@@ -20,13 +20,13 @@ import (
 )
 
 type FileMeta struct {
-	Key         string `json:"key"`
-	Title       string `json:"title,omitempty"`
-	ContentType string `json:"ContentType"`
-	Thumb       string `json:"thumb,omitempty"`
-	Views       int    `json:"views"`
-	ViewedBy 	 []string `json:"viewedBy,omitempty"`
-	Tags 			[]string `json:"tags,omitempty"`
+	Key         string   `json:"key"`
+	Title       string   `json:"title,omitempty"`
+	ContentType string   `json:"ContentType"`
+	Thumb       string   `json:"thumb,omitempty"`
+	Views       int      `json:"views"`
+	ViewedBy    []string `json:"viewedBy,omitempty"`
+	Tags        []string `json:"tags,omitempty"`
 }
 
 type item struct {
@@ -36,7 +36,6 @@ type item struct {
 	Preview     string `json:"preview"`
 	Views       int    `json:"views"`
 }
-
 
 type Meta struct {
 	files []FileMeta
@@ -61,7 +60,7 @@ func (meta *Meta) incrementViews(key, name string) error {
 	meta.Lock()
 	defer meta.Unlock()
 	fmt.Printf("VIEW DEBUG: key=%s name=%q\n", key, name)
-	
+
 	for i := range meta.files {
 		if meta.files[i].Key != key {
 			continue
@@ -73,7 +72,7 @@ func (meta *Meta) incrementViews(key, name string) error {
 		}
 		meta.files[i].Views++
 		meta.files[i].ViewedBy = append(meta.files[i].ViewedBy, name)
-		break	
+		break
 	}
 
 	b, err := json.MarshalIndent(meta.files, "", " ")
@@ -169,7 +168,7 @@ func Upload(c echo.Context) error {
 		})
 	}
 
-	thumbName, err := saveThumbnail(form)
+	thumbName, err := saveThumbnail(form, file)
 	if err != nil {
 		fmt.Println("THUMBNAIL ERROR:", err)
 	}
@@ -200,13 +199,21 @@ func Upload(c echo.Context) error {
 	})
 }
 
-func saveThumbnail(form *multipart.Form) (string, error) {
-	thumbs := form.File["thumbnail"]
-	if len(thumbs) == 0 {
+func isThumbnailImageType(contentType string) bool {
+	ct := strings.ToLower(strings.TrimSpace(strings.Split(contentType, ";")[0]))
+	return ct == "image/png" || ct == "image/jpeg"
+}
+
+func saveThumbnail(form *multipart.Form, file *multipart.FileHeader) (string, error) {
+	var t *multipart.FileHeader
+
+	if thumbs := form.File["thumbnail"]; len(thumbs) > 0 {
+		t = thumbs[0]
+	} else if file != nil && isThumbnailImageType(file.Header.Get("Content-Type")) {
+		t = file
+	} else {
 		return "", nil
 	}
-
-	t := thumbs[0]
 
 	src, err := t.Open()
 	if err != nil {
@@ -251,7 +258,6 @@ func dispItems(items []FileMeta) []item {
 		return items[i].Views > items[j].Views
 	})
 
-
 	result := make([]item, 0, len(items))
 
 	for _, obj := range items {
@@ -265,6 +271,8 @@ func dispItems(items []FileMeta) []item {
 
 		if obj.Thumb != "" {
 			preview = "/static/images/" + obj.Thumb
+		} else if isThumbnailImageType(obj.ContentType) {
+			preview = "/static/images/" + obj.Key
 		}
 
 		result = append(result, item{
