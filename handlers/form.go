@@ -201,7 +201,7 @@ func Upload(c echo.Context) error {
 
 func isThumbnailImageType(contentType string) bool {
 	ct := strings.ToLower(strings.TrimSpace(strings.Split(contentType, ";")[0]))
-	return ct == "image/png" || ct == "image/jpeg"
+	return ct == "image/png" || ct == "image/jpeg" || ct == "image/jpg" || ct == "image/gif" || ct == "image/webp"
 }
 
 func saveThumbnail(form *multipart.Form, file *multipart.FileHeader) (string, error) {
